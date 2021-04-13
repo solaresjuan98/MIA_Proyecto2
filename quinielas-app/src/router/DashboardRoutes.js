@@ -5,6 +5,7 @@ import { AdminDashboard } from "../components/Admin/AdminDashboard";
 import { Jornadas } from "../components/Admin/Jornadas";
 import { Resultados } from "../components/Admin/Resultados";
 import { AdminNavbar } from "../components/UI/AdminNavbar";
+import { UserNavbar } from "../components/UI/UserNavbar";
 import { UserDashboard } from "../components/User/UserDashboard";
 
 export const DashboardRoutes = () => {
@@ -12,11 +13,14 @@ export const DashboardRoutes = () => {
   console.log(user.rol);
   let isUser = false;
 
-  
+  if (user.rol === "user") {
+    isUser = true;
+  }
 
   return (
-    <>      
-      <AdminNavbar />
+    <>
+      {isUser ? <UserNavbar /> : <AdminNavbar />}
+
       <div>
         <Switch>
           <Route exact path="/adminHome" component={AdminDashboard} />

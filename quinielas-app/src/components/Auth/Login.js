@@ -14,19 +14,18 @@ export const Login = ({ history }) => {
       type: types.login,
       payload: {
         id: 23,
-        name: "Admin",
+        name: "Juan",
         rol: rolUsuario,
       },
     });
 
-    history.replace("/adminHome");
-    /*
-    if (rolUsuario === "Administrator") {
+    //history.replace("/adminHome");
+
+    if (rolUsuario === "administrator") {
       history.replace("/adminHome");
     } else {
       history.replace("/userHome");
     }
-    */
   };
 
   return (

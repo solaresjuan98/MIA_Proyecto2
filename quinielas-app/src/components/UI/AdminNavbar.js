@@ -25,7 +25,7 @@ export const AdminNavbar = () => {
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <NavLink className="navbar-brand" exact to="/">
-          Navbar
+          AdminNavbar
         </NavLink>
         <button
           className="navbar-toggler"
