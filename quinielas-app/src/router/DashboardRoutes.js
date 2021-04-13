@@ -7,6 +7,7 @@ import { Resultados } from "../components/Admin/Resultados";
 import { AdminNavbar } from "../components/UI/AdminNavbar";
 import { UserNavbar } from "../components/UI/UserNavbar";
 import { UserDashboard } from "../components/User/UserDashboard";
+import { CalendarScreen } from "../components/calendar/CalendarScreen";
 
 export const DashboardRoutes = () => {
   const { user } = useContext(AuthContext);
@@ -27,6 +28,8 @@ export const DashboardRoutes = () => {
           <Route exact path="/jornadas" component={Jornadas} />
           <Route exact path="/resultados" component={Resultados} />
           <Route exact path="/userHome" component={UserDashboard} />
+          <Route exact path="/calendar" component={CalendarScreen} />
+
           <Redirect to="/adminHome" />
         </Switch>
       </div>

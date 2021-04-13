@@ -3,3 +3,14 @@ body{
   background-color: rgb(209, 224, 236)
 }
 
+/*Calendar styles*/
+.calendar-screen {
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+}
+
+.rbc-calendar {
+
+  height: 100%;
+}

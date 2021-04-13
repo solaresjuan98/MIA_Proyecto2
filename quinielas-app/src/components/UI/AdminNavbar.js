@@ -69,7 +69,7 @@ export const AdminNavbar = () => {
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/calendar">
                 Calendario
               </NavLink>
             </li>
