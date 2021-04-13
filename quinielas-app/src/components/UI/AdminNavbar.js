@@ -1,16 +1,34 @@
-import React from "react";
-import '../../index.css';
-import { AdminDashboard } from "../Admin/AdminDashboard";
+import React, { useContext } from "react";
+import { useHistory, NavLink } from "react-router-dom";
+import { AuthContext } from "../../Auth/AuthContext";
+
+import "../../index.css";
+import { types } from "../../types/types";
 
 export const AdminNavbar = () => {
+  const {
+    user: { name },
+    dispatch,
+  } = useContext(AuthContext);
+  //console.log(rol);
+
+  const history = useHistory();
+
+  const handleLogout = () => {
+    history.replace("/login");
+    dispatch({
+      type: types.logout,
+    });
+  };
+
   return (
     <div>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href={() => false}>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+        <NavLink className="navbar-brand" exact to="/">
           Navbar
-        </a>
+        </NavLink>
         <button
-          class="navbar-toggler"
+          className="navbar-toggler"
           type="button"
           data-toggle="collapse"
           data-target="#navbarColor01"
@@ -18,74 +36,62 @@ export const AdminNavbar = () => {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <span class="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarColor01">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href={() => false}>
+        <div className="collapse navbar-collapse" id="navbarColor01">
+          <ul className="navbar-nav mr-auto">
+            <li className="nav-item active">
+              <NavLink className="nav-link" exact to="/">
                 Home
-                <span class="sr-only">(current)</span>
-              </a>
+                <span className="sr-only">(current)</span>
+              </NavLink>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href={() => false}>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/">
                 Data
-              </a>
+              </NavLink>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href={() => false}>
-                Reports
-              </a>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/">
+                Carga
+              </NavLink>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href={() => false}>
-                About
-              </a>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/jornadas">
+                Jornadas
+              </NavLink>
             </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                data-toggle="dropdown"
-                href={() => false}
-                role="button"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Dropdown
-              </a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href={() => false}>
-                  Action
-                </a>
-                <a class="dropdown-item" href={() => false}>
-                  Another action
-                </a>
-                <a class="dropdown-item" href={() => false}>
-                  Something else here
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href={() => false}>
-                  Separated link
-                </a>
-              </div>
+
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/">
+                Reportes
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/">
+                Calendario
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/resultados">
+                Resultados
+              </NavLink>
             </li>
           </ul>
           <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
-        <ul className="navbar-nav ml-auto">
-          <span className="nav-item nav-link text-info">USERNAME</span>
-          <button
-            className="nav-item nav-link btn"
-          >
-            Logout
-          </button>
-        </ul>
-      </div>
+            <ul className="navbar-nav ml-auto">
+              <span className="nav-item nav-link text-info">{name}</span>
+              <button
+                className="nav-item nav-link btn btn-danger"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+            </ul>
+          </div>
         </div>
       </nav>
-    
-    <AdminDashboard />
     </div>
   );
 };

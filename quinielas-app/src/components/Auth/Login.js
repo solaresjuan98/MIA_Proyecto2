@@ -1,18 +1,48 @@
-import React from "react";
-import './Login.css';
+import React, { useContext } from "react";
+import { AuthContext } from "../../Auth/AuthContext";
+import { types } from "../../types/types";
+import "./Login.css";
 
-export const Login = () => {
+export const Login = ({ history }) => {
+  const { dispatch } = useContext(AuthContext);
+
+  const rolUsuario = "user";
+  const handleLogin = () => {
+    //history.replace("/adminHome");
+
+    dispatch({
+      type: types.login,
+      payload: {
+        id: 23,
+        name: "Admin",
+        rol: rolUsuario,
+      },
+    });
+
+    history.replace("/adminHome");
+    /*
+    if (rolUsuario === "Administrator") {
+      history.replace("/adminHome");
+    } else {
+      history.replace("/userHome");
+    }
+    */
+  };
+
   return (
-    <div className="container login-container">
+    <div className="container mt-5">
+      <br />
+      <br />
+      <br />
       <div className="row">
         <div className="col-md-6 login-form-1">
-          <h3>Ingreso</h3>
+          <h3>Iniciar Sesión</h3>
           <form>
             <div className="form-group">
               <input
                 type="text"
                 className="form-control"
-                placeholder="Correo"
+                placeholder="Nombre de usuario"
               />
             </div>
             <div className="form-group">
@@ -23,13 +53,18 @@ export const Login = () => {
               />
             </div>
             <div className="form-group">
-              <input type="submit" className="btnSubmit" value="Login" />
+              <input
+                type="button"
+                className="btnSubmit"
+                value="Ingresar"
+                onClick={handleLogin}
+              />
             </div>
           </form>
         </div>
 
         <div className="col-md-6 login-form-2">
-          <h3>Registro</h3>
+          <h3>Registrarse</h3>
           <form>
             <div className="form-group">
               <input
@@ -42,9 +77,10 @@ export const Login = () => {
               <input
                 type="email"
                 className="form-control"
-                placeholder="Correo"
+                placeholder="Correo electrónico"
               />
             </div>
+
             <div className="form-group">
               <input
                 type="password"
@@ -57,12 +93,17 @@ export const Login = () => {
               <input
                 type="password"
                 className="form-control"
-                placeholder="Repita la contraseña"
+                placeholder="Repetir contraseña"
               />
             </div>
 
             <div className="form-group">
-              <input type="submit" className="btnSubmit" value="Crear cuenta" />
+              <input
+                type="submit"
+                className="btnSubmit"
+                value="Crear cuenta"
+                onClick={handleLogin}
+              />
             </div>
           </form>
         </div>
