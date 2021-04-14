@@ -24,6 +24,7 @@ const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fechaFinal = ahora.clone().add(1, "hours"); // 1 hora despues del inicio
 
 export const CalendarModal = () => {
+  const [modalIsOpen, setModalIsOpen] = useState(true);
   const [dateStart, setdateStart] = useState(ahora.toDate());
   const [dateEnd, setDateEnd] = useState(fechaFinal.toDate());
   const [tituloValido, setTituloValido] = useState(true);
@@ -45,7 +46,7 @@ export const CalendarModal = () => {
   };
 
   const closeModal = () => {
-    //setisOpen(false);
+    setModalIsOpen(false);
   };
 
   const handleStartDateChange = (e) => {
@@ -100,7 +101,7 @@ export const CalendarModal = () => {
 
   return (
     <Modal
-      isOpen={true}
+      isOpen={modalIsOpen}
       //onAfterOpen={afterOpenModal}
       onRequestClose={closeModal}
       style={customStyles}

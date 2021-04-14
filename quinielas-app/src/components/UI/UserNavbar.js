@@ -23,7 +23,7 @@ export const UserNavbar = () => {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <NavLink className="navbar-brand" exact to="/">
+        <NavLink className="navbar-brand" exact to="/userHome">
           Inicio
         </NavLink>
         <button
@@ -41,7 +41,7 @@ export const UserNavbar = () => {
         <div className="collapse navbar-collapse" id="navbarColor01">
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/userHome">
                 Home
                 <span className="sr-only">(current)</span>
               </NavLink>
@@ -52,7 +52,7 @@ export const UserNavbar = () => {
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/membresia">
                 Membresia
               </NavLink>
             </li>

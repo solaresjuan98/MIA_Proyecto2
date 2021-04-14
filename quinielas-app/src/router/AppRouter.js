@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { AuthContext } from "../Auth/AuthContext";
 import { Login } from "../components/Auth/Login";
-import { DashboardRoutes } from "./DashboardRoutes";
+import { InternalRoutes } from "./InternalRoutes";
 import { PrivateRoute } from "./PrivateRoute";
 import { PublicRoute } from "./PublicRoute";
 
@@ -22,7 +22,7 @@ export const AppRouter = () => {
           />
           <PrivateRoute
             path="/"
-            component={DashboardRoutes}
+            component={InternalRoutes}
             isAuthenticated={user.logged}
           />
         </Switch>

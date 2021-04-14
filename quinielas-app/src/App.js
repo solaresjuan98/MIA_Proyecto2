@@ -2,10 +2,14 @@ import React, { useEffect, useReducer } from "react";
 import { AuthContext } from "./Auth/AuthContext";
 import { authReducer } from "./Auth/AuthReducer";
 import { AppRouter } from "./router/AppRouter";
-
+ 
 const init = () => {
   return JSON.parse(localStorage.getItem("user")) || { logged: false };
 };
+
+
+
+
 
 export const App = () => {
   const [user, dispatch] = useReducer(authReducer, {}, init);
@@ -20,3 +24,5 @@ export const App = () => {
     </AuthContext.Provider>
   );
 };
+
+

@@ -16,7 +16,7 @@ export const PublicRoute = ({
           !isAuthenticated ? (
             <Component {...props} />
           ) : (
-            <Redirect to="/adminDashboard" />
+            <Redirect to="/" />
           )
         }
       />

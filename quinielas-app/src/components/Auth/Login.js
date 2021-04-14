@@ -10,18 +10,26 @@ export const Login = ({ history }) => {
   const handleLogin = () => {
     //history.replace("/adminHome");
 
+    /*
+      Membresias de usuario
+       - Gold
+       - Silver
+       - Bronze
+    */
+
     dispatch({
       type: types.login,
       payload: {
         id: 23,
         name: "Juan",
         rol: rolUsuario,
+        membresia: "Silver"
       },
     });
 
     //history.replace("/adminHome");
 
-    if (rolUsuario === "administrator") {
+    if (rolUsuario === "administrador") {
       history.replace("/adminHome");
     } else {
       history.replace("/userHome");
