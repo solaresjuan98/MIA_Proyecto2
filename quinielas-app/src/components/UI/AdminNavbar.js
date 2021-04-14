@@ -42,14 +42,14 @@ export const AdminNavbar = () => {
         <div className="collapse navbar-collapse" id="navbarColor01">
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/adminHome">
                 Home
                 <span className="sr-only">(current)</span>
               </NavLink>
             </li>
             <li className="nav-item">
               <NavLink className="nav-link" exact to="/">
-                Data
+                Datos
               </NavLink>
             </li>
             <li className="nav-item">
@@ -57,6 +57,13 @@ export const AdminNavbar = () => {
                 Carga
               </NavLink>
             </li>
+
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/deportes">
+                Deportes
+              </NavLink>
+            </li>
+
             <li className="nav-item">
               <NavLink className="nav-link" exact to="/jornadas">
                 Jornadas
@@ -64,7 +71,7 @@ export const AdminNavbar = () => {
             </li>
 
             <li className="nav-item">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/reportes">
                 Reportes
               </NavLink>
             </li>

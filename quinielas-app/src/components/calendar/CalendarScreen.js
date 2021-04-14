@@ -7,7 +7,7 @@ import { messages } from "../../helpers/calendar-es";
 import { CalendarEvent } from "./CalendarEvent";
 import { CalendarModal } from "./CalendarModal";
 import { AuthContext } from "../../Auth/AuthContext";
-//import '../../App.css';
+import "../../App.css";
 
 moment.locale("es");
 const localizer = momentLocalizer(moment);
@@ -87,9 +87,9 @@ export const CalendarScreen = () => {
   };
 
   return (
-    <div className="container mt-5 calendar-screen">
+    <div>
       {tieneMembresia ? (
-        <div>
+        <div className="container mt-5 calendar-screen">
           <Calendar
             localizer={localizer}
             events={events}

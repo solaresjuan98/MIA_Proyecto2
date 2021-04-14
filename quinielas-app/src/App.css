@@ -1,8 +1,9 @@
 body {
-  background-color: rgb(209, 224, 236);
+  background-color: rgb(188, 225, 255);
 }
 
 /*Calendar styles*/
+
 .calendar-screen {
   display: flex;
   flex-flow: column;
