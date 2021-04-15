@@ -43,17 +43,17 @@ export const AdminNavbar = () => {
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
               <NavLink className="nav-link" exact to="/adminHome">
-                Home
+                Inicio
                 <span className="sr-only">(current)</span>
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/adminHome">
                 Datos
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" exact to="/">
+              <NavLink className="nav-link" exact to="/adminHome">
                 Carga
               </NavLink>
             </li>

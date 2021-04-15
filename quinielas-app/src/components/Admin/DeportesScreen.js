@@ -22,7 +22,7 @@ export const DeportesScreen = () => {
         <div className="col-sm mb-5">
             <h2 className="mb-5">Deportes creados: </h2>
           <div
-            className="card border-primary mb-3"
+            className="card border-dark mb-3"
           >
             <div className="card-header">Clientes gold</div>
             <div className="card-body">
