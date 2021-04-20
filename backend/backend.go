@@ -16,7 +16,9 @@ import (
 //
 //var db *sql.DB
 
-//
+// -----------STRUCTS -----------
+
+// TEST STRUCTS
 type task struct {
 	Id      int    `json:"ID"`
 	Name    string `json:"Name"`
@@ -26,6 +28,30 @@ type task struct {
 type People struct {
 	Localidad string `json:"localidad"`
 	Nombre    string `json:"nombre"`
+}
+
+// ---- END TEST STRUTS ----
+
+// DB STRUCTS
+
+// Tier
+type Tier struct {
+	NombreTier string `json:"NombreTier"`
+	Precio     int    `json:"precio"`
+}
+
+// Deportes
+type Deporte struct {
+	Id_Deporte int    `json:"Id_deporte"`
+	Nombre     string `json:"Nombre"`
+}
+
+// Recompensas
+type Recompensa struct {
+	Id_recompensa       int `json:"Id_recompensa"`
+	Id_cliente          int `json:"Id_cliente"`
+	Cantidad_Recompensa int `json:"Cantidad_Recompensa"`
+	Ultima_Recompensa   int `json:"Ultima_Recompensa"`
 }
 
 type allTasks []task
@@ -131,6 +157,8 @@ func getPrueba(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// ----------- PETICION DE PRUEBA -----------
+
 func getPeopleRouter(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	//limit := 45
@@ -144,7 +172,7 @@ func getPeopleRouter(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Obtener datos de la
+// Obtener datos de la tabla de prueba
 func getData(n int) []People {
 
 	people := make([]People, 0)
@@ -166,6 +194,79 @@ func getData(n int) []People {
 	return people
 
 }
+
+// ----------- OBTENER TIER -----------
+func obtenerTierRouter(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	tier := obtenerTier(limit)
+
+	tierJSON, _ := json.Marshal(tier)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(tierJSON)
+}
+
+func obtenerTier(n int) []Tier {
+
+	tier := make([]Tier, 0)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query("SELECT nombre_tier, precio FROM TIER")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for rows.Next() {
+		t := new(Tier)
+		rows.Scan(&t.NombreTier, &t.Precio)
+		tier = append(tier, *t)
+	}
+
+	return tier
+
+}
+
+// ----------- OBTENER DEPORTES -----------
+func getDeportesRouter(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	deportes := obtenerDeportes(limit)
+
+	deportesJSON, _ := json.Marshal(deportes)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(deportesJSON)
+
+}
+
+func obtenerDeportes(n int) []Deporte {
+
+	deportes := make([]Deporte, 0)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query("SELECT id_deporte, nombre_deporte FROM deporte")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for rows.Next() {
+		d := new(Deporte)
+		rows.Scan(&d.Id_Deporte, &d.Nombre)
+		deportes = append(deportes, *d)
+	}
+
+	return deportes
+
+}
+
+// ----------- FUNCION MAIN -----------
 
 func main() {
 
@@ -189,6 +290,8 @@ func main() {
 
 	// RUTAS A LA BASE DE DATOS
 	router.HandleFunc("/prueba", getPeopleRouter).Methods("GET")
+	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")
+	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")
 
 	// SET PORT
 	log.Fatal(http.ListenAndServe(":4000", router))
