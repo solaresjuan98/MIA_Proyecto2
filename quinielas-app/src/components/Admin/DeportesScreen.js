@@ -1,37 +1,64 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { TarjetaDeportes } from "./TarjetaDeportes";
 
 export const DeportesScreen = () => {
+  const [deportes, obtenerDeportes] = useState("");
+
+  const url = "http://localhost:4000/deportes";
+
+  useEffect(() => {
+    obtenerListaDeportes();
+  }, []);
+
+  // ------- OBTENER LISTA DE DEPORTES -------
+  const obtenerListaDeportes = () => {
+    axios
+      .get(url)
+      .then((response) => {
+        const listaDeportes = response.data;
+        obtenerDeportes(listaDeportes);
+        console.log(listaDeportes[1].Nombre);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+  };
+
   return (
     <div className="container mt-5">
       <div className="row">
         <div className="col-sm-4">
-          <h3>Crear nuevo deporte</h3>
-
-          <div class="card border-light mb-3">
-            <div class="card-header">Crear nuevo deporte </div>
-            <div class="card-body">
-              <h4 class="card-title">Light card title</h4>
-              <p class="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-              </p>
+          <div className="card border-light mb-3">
+            <div className="card-header">
+              <h5 className="card-title">Crear nuevo deporte</h5>{" "}
+            </div>
+            <div className="card-body">
+              <form>
+                <div class="form-group">
+                  <label class="col-form-label" for="inputDefault">
+                    Nombre del deporte
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control mt-2"
+                    placeholder="Nombre del deporte"
+                    autoComplete="off"
+                    id="inputDefault"
+                  />
+                </div>
+                <div className="form-group">
+                  <button type="button" class="btn btn-primary">
+                    Crear deporte
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
 
         <div className="col-sm mb-5">
-            <h2 className="mb-5">Deportes creados: </h2>
-          <div
-            className="card border-dark mb-3"
-          >
-            <div className="card-header">Clientes gold</div>
-            <div className="card-body">
-              <h4 className="card-title">4455</h4>
-              <p className="card-text">
-                Some quick example text to build on the card title and make up
-                the bulk of the card's content.
-              </p>
-            </div>
+          <h2 className="mb-5">Deportes creados: </h2>
+          <div className="container mt-5">
+            <TarjetaDeportes deportes={deportes} />
           </div>
         </div>
       </div>
