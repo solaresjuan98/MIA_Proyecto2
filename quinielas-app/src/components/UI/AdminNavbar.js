@@ -65,6 +65,12 @@ export const AdminNavbar = () => {
             </li>
 
             <li className="nav-item">
+              <NavLink className="nav-link" exact to="/temporadas">
+                Temporadas
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
               <NavLink className="nav-link" exact to="/jornadas">
                 Jornadas
               </NavLink>

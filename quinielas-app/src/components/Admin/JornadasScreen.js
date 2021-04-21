@@ -1,13 +1,14 @@
 import React from "react";
-
-export const Jornadas = () => {
+// Arui me quede
+export const JornadasScreen = () => {
   return (
-    <div className="container-fluid mt-5">
+    <div className="container mt-5">
       <div className="row mt-5">
         <div className="col-sm-4">
-          <h3>Crear nueva jornada</h3>
           <div className="card border-dark mb-3">
-            <div className="card-header">Form</div>
+            <div className="card-header">
+              <h5 className="card-title">Crear nueva temporada</h5>{" "}
+            </div>
             <div className="card-body">
               <h4 className="card-title">4455</h4>
               <p className="card-text">
@@ -39,9 +40,7 @@ export const Jornadas = () => {
           <h3>Terminar jornada</h3>
         </div>
 
-        <div className="col-sm">
-
-        </div>
+        <div className="col-sm"></div>
       </div>
     </div>
   );

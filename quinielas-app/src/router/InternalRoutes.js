@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Redirect, Route, Switch } from "react-router";
 import { AuthContext } from "../Auth/AuthContext";
 import { AdminDashboard } from "../components/Admin/AdminDashboard";
-import { Jornadas } from "../components/Admin/Jornadas";
+import { JornadasScreen } from "../components/Admin/JornadasScreen";
 import { Resultados } from "../components/Admin/Resultados";
 import { AdminNavbar } from "../components/UI/AdminNavbar";
 import { UserNavbar } from "../components/UI/UserNavbar";
@@ -13,6 +13,7 @@ import { PerfilScreen } from "../components/User/PerfilScreen";
 import { PosicionesScreen } from "../components/User/PosicionesScreen";
 import { DeportesScreen } from "../components/Admin/DeportesScreen";
 import { ReportesScreen } from "../components/Admin/ReportesScreen";
+import { TemporadasScreen } from "../components/Admin/TemporadasScreen";
 
 export const InternalRoutes = () => {
   const { user } = useContext(AuthContext);
@@ -32,10 +33,11 @@ export const InternalRoutes = () => {
         <Switch>
           {/*RUTAS PARA ADMINISTRADOR*/}
           <Route exact path="/adminHome" component={AdminDashboard} />
-          <Route exact path="/jornadas" component={Jornadas} />
+          <Route exact path="/jornadas" component={JornadasScreen} />
           <Route exact path="/resultados" component={Resultados} />
           <Route exact path="/deportes" component={DeportesScreen} />
           <Route exact path="/reportes" component={ReportesScreen} />
+          <Route exact path="/temporadas" component={TemporadasScreen} />
 
           {/*RUTAS PARA USUARIO */}
           <Route exact path="/userHome" component={UserDashboard} />
