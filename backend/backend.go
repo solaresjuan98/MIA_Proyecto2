@@ -54,6 +54,13 @@ type Recompensa struct {
 	Ultima_Recompensa   int `json:"Ultima_Recompensa"`
 }
 
+// Temporadas
+type Temporada struct {
+	Id_temporada int    `json:"Id_temporada"`
+	Id_deporte   int    `json:"Id_deporte"`
+	Estado       string `json:"Estado"`
+}
+
 type allTasks []task
 
 //type allTest []People
@@ -266,6 +273,41 @@ func obtenerDeportes(n int) []Deporte {
 
 }
 
+// ----------- OBTENER TEMPORADAS -----------
+func obtenerTemporadasRouter(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	temporadas := obtenerTemporadas(limit)
+
+	temporadasJSON, _ := json.Marshal(temporadas)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(temporadasJSON)
+}
+
+func obtenerTemporadas(n int) []Temporada {
+
+	temporadas := make([]Temporada, 0)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query("SELECT id_temporada, estado_temporada, id_deporte FROM temporada")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for rows.Next() {
+		t := new(Temporada)
+		rows.Scan(&t.Id_temporada, &t.Estado, &t.Id_deporte)
+		temporadas = append(temporadas, *t) //
+	}
+
+	return temporadas
+}
+
 // ----------- FUNCION MAIN -----------
 
 func main() {
@@ -292,6 +334,7 @@ func main() {
 	router.HandleFunc("/prueba", getPeopleRouter).Methods("GET")
 	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")
 	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")
+	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET")
 
 	// SET PORT
 	log.Fatal(http.ListenAndServe(":4000", router))
