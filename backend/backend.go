@@ -365,11 +365,6 @@ func obtenerJornadas(n int) []Jornada {
 func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 
 	var nuevoDeporte Deporte
-	/*setupCorsResponse(&w, r)
-	if (*r).Method == "OPTIONS" {
-		return
-	}
-	*/
 	reqBody, err := ioutil.ReadAll(r.Body)
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
@@ -420,7 +415,7 @@ func eliminarDeporteRouter(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &deporteEliminar)
 	fmt.Println(deporteEliminar.Nombre)
 
-	res, err := db.Exec("DELETE FROM DEPORTE WHERE ID_DEPORTE = " + strconv.Itoa(deporteEliminar.Id_Deporte))
+	res, err := db.Exec("DELETE FROM DEPORTE WHERE Nombre = '" + deporteEliminar.Nombre + "'")
 
 	if err != nil {
 		fmt.Println(err)
@@ -470,8 +465,8 @@ func main() {
 	// Peticiones POST
 	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")
 
-	// Peticiones DELETE
-	router.HandleFunc("/eliminarDeporte/{Id_deporte}", eliminarDeporteRouter).Methods("DELETE")
+	// Peticiones DELETE (aun no funciona)
+	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")
 	// SETEAR PUERTO
 	log.Fatal(http.ListenAndServe(":4000", handlers.CORS(headers, methods, origins)(router)))
 
