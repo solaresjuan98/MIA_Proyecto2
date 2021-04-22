@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-oci8"
 )
@@ -61,10 +62,18 @@ type Temporada struct {
 	Estado       string `json:"Estado"`
 }
 
+// Jornadas
+type Jornada struct {
+	Id_jornada   int    `json:"Id_jornada"`
+	Id_temporada int    `json:"Id_temporada"`
+	Fecha_inicio string `json:"Fecha_inicio"`
+	Fecha_final  string `json:"Fecha_final"`
+	Estado       string `json:"Estado"`
+}
+
 type allTasks []task
 
-//type allTest []People
-
+// Arreglo de tareas [PRUEBAS]
 var tasks = allTasks{
 	{
 		Id:      1,
@@ -263,10 +272,12 @@ func obtenerDeportes(n int) []Deporte {
 		log.Fatal(err)
 	}
 
+	defer db.Close()
+
 	for rows.Next() {
 		d := new(Deporte)
 		rows.Scan(&d.Id_Deporte, &d.Nombre)
-		deportes = append(deportes, *d)
+		deportes = append(deportes, *d) //
 	}
 
 	return deportes
@@ -284,6 +295,7 @@ func obtenerTemporadasRouter(w http.ResponseWriter, r *http.Request) {
 	temporadasJSON, _ := json.Marshal(temporadas)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	w.WriteHeader(http.StatusOK)
 	w.Write(temporadasJSON)
 }
@@ -308,11 +320,127 @@ func obtenerTemporadas(n int) []Temporada {
 	return temporadas
 }
 
+// ----------- OBTENER JORNADAS -----------
+func obtenerJornadasRouter(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	jornadas := obtenerJornadas(limit)
+
+	jornadasJSON, _ := json.Marshal(jornadas)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jornadasJSON)
+
+}
+
+func obtenerJornadas(n int) []Jornada {
+
+	jornadas := make([]Jornada, 0)
+	// CONSULTA SQL
+	query := "SELECT ID_JORNADA, ID_TEMPORADA, CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO, CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN, ESTADO_JORNADA FROM JORNADA"
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query(query)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for rows.Next() {
+		j := new(Jornada)
+		rows.Scan(&j.Id_jornada, &j.Id_temporada, &j.Fecha_inicio, &j.Fecha_final, &j.Estado)
+		jornadas = append(jornadas, *j)
+	}
+
+	return jornadas
+
+}
+
+// ------------------------------------- PETICIONES POST ---------------------------------------------------
+
+// -------------- CREAR DEPORTE --------------
+func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
+
+	var nuevoDeporte Deporte
+	/*setupCorsResponse(&w, r)
+	if (*r).Method == "OPTIONS" {
+		return
+	}
+	*/
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &nuevoDeporte)
+
+	res, err := db.Exec("INSERT INTO DEPORTE(NOMBRE_DEPORTE) VALUES ('" + nuevoDeporte.Nombre + "')")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(nuevoDeporte)
+	fmt.Println(res.LastInsertId())
+
+}
+
+func setupCorsResponse(w *http.ResponseWriter, req *http.Request) {
+	fmt.Println(".l.")
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
+}
+
+// ------------------------------------- PETICIONES DELETE ---------------------------------------------------
+
+// -------------- ELIMINAR DEPORTE --------------
+func eliminarDeporteRouter(w http.ResponseWriter, r *http.Request) {
+
+	var deporteEliminar Deporte
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &deporteEliminar)
+	fmt.Println(deporteEliminar.Nombre)
+
+	res, err := db.Exec("DELETE FROM DEPORTE WHERE ID_DEPORTE = " + strconv.Itoa(deporteEliminar.Id_Deporte))
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//w.WriteHeader(http.MethodDelete)
+	fmt.Println(res)
+}
+
 // ----------- FUNCION MAIN -----------
 
 func main() {
 
 	router := mux.NewRouter().StrictSlash(true)
+	headers := handlers.AllowedHeaders([]string{"X-Request-Headers", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	origins := handlers.AllowedOrigins([]string{"*"})
 
 	// CONECTANDO BASE DE DATOS
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
@@ -331,13 +459,21 @@ func main() {
 	router.HandleFunc("/tasks/{id}", deleteTask).Methods("DELETE")
 
 	// RUTAS A LA BASE DE DATOS
+
+	// Peticiones GET
 	router.HandleFunc("/prueba", getPeopleRouter).Methods("GET")
 	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")
 	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")
 	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET")
+	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")
 
-	// SET PORT
-	log.Fatal(http.ListenAndServe(":4000", router))
+	// Peticiones POST
+	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")
+
+	// Peticiones DELETE
+	router.HandleFunc("/eliminarDeporte/{Id_deporte}", eliminarDeporteRouter).Methods("DELETE")
+	// SETEAR PUERTO
+	log.Fatal(http.ListenAndServe(":4000", handlers.CORS(headers, methods, origins)(router)))
 
 }
 

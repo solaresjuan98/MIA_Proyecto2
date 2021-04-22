@@ -104,7 +104,7 @@ export const TemporadasScreen = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <button type="button" className="btn btn-primary mt-3">
+                  <button type="button" className="btn btn-primary mt-3 btn-block">
                     Crear temporada
                   </button>
                 </div>

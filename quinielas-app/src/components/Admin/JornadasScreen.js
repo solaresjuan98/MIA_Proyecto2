@@ -100,7 +100,9 @@ export const JornadasScreen = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <button class="btn btn-primary">Crear jornada</button>
+                  <button class="btn btn-primary btn-block">
+                    Crear jornada
+                  </button>
                 </div>
               </form>
             </div>
