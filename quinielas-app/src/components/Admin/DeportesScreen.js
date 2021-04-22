@@ -5,6 +5,12 @@ import { TarjetaDeportes } from "./TarjetaDeportes";
 export const DeportesScreen = () => {
   const [deportes, obtenerDeportes] = useState("");
 
+  const [deporte, setDeporte] = useState({
+    NombreDeporte: "",
+  });
+
+  const { NombreDeporte } = deporte;
+
   const url = "http://localhost:4000/deportes";
 
   useEffect(() => {
@@ -23,6 +29,15 @@ export const DeportesScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
+
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Viva el real madrid <3");
+    //console.log(NombreDeporte);
+  };
+
   return (
     <div className="container mt-5">
       <div className="row">
@@ -32,21 +47,22 @@ export const DeportesScreen = () => {
               <h5 className="card-title">Crear nuevo deporte</h5>{" "}
             </div>
             <div className="card-body">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div class="form-group">
                   <label class="col-form-label" for="inputDefault">
                     Nombre del deporte
                   </label>
                   <input
                     type="text"
-                    class="form-control mt-2"
+                    className="form-control mt-2"
                     placeholder="Nombre del deporte"
                     autoComplete="off"
-                    id="inputDefault"
+                    //onChange={onChangeValue}
+                    //value={NombreDeporte}
                   />
                 </div>
                 <div className="form-group">
-                  <button type="button" class="btn btn-primary">
+                  <button type="submit" class="btn btn-primary btn-block">
                     Crear deporte
                   </button>
                 </div>

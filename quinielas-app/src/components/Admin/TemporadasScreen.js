@@ -18,8 +18,7 @@ export const TemporadasScreen = () => {
   // Estado de deportes
   const [deportes, obtenerDeportes] = useState([]); // iniciar como un arreglo
   // Estado de temporadas
-  const [temporadas, obtenerTemporadas] = useState([])
-
+  const [temporadas, obtenerTemporadas] = useState([]);
 
   const url = "http://localhost:4000/";
 
@@ -57,10 +56,10 @@ export const TemporadasScreen = () => {
       .get(`${url}temporadas`)
       .then((response) => {
         const listaTemporadas = response.data;
-        obtenerTemporadas(listaTemporadas)
+        obtenerTemporadas(listaTemporadas);
       })
-      .catch((err) => console.error(`Error: ${err}`))
-  }
+      .catch((err) => console.error(`Error: ${err}`));
+  };
 
   return (
     <div className="container mt-5">

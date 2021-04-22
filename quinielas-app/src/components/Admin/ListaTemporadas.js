@@ -17,35 +17,33 @@ export const ListaTemporadas = (props) => {
         </thead>
         <tbody>
           {temporadas.map((temporada, i) => {
-
-            if(temporada.Estado === 'Activo'){
+            if (temporada.Estado === "Activo") {
               return (
                 <tr className="table-light">
                   <th scope="row">{temporada.Id_temporada}</th>
                   <td>{temporada.Id_deporte}</td>
-  
+
                   <td>{temporada.Estado}</td>
-  
+
                   <td>
-                    <button class="btn btn-danger">Terminar</button>
+                    <button class="btn btn-danger">Finalizar</button>
                   </td>
                 </tr>
               );
-            }else {
+            } else {
               return (
                 <tr className="table-light">
                   <th scope="row">{temporada.Id_temporada}</th>
                   <td>{temporada.Id_deporte}</td>
-  
+
                   <td>{temporada.Estado}</td>
-  
+
                   <td>
-                    <button class="btn btn-primary">Iniciar</button>
+                    <button class="btn btn-primary">Iniciar </button>
                   </td>
                 </tr>
               );
             }
-
           })}
         </tbody>
       </table>
