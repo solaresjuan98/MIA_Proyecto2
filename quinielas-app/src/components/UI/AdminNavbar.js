@@ -24,7 +24,7 @@ export const AdminNavbar = () => {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <NavLink className="navbar-brand" exact to="/">
+        <NavLink className="navbar-brand" exact to="/adminHome">
           AdminNavbar
         </NavLink>
         <button
@@ -48,12 +48,7 @@ export const AdminNavbar = () => {
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" exact to="/adminHome">
-                Datos
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" exact to="/adminHome">
+              <NavLink className="nav-link" exact to="/carga">
                 Carga
               </NavLink>
             </li>

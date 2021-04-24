@@ -21,6 +21,7 @@ export const ListaJornadas = (props) => {
         <thead className="thead-dark">
           <tr>
             <th scope="col">Id jornada</th>
+            <th scope="col">Nombre jornada</th>
             <th scope="col">Id temporada</th>
             <th scope="col">Fecha inicio</th>
             <th scope="col">Fecha final </th>
@@ -31,6 +32,9 @@ export const ListaJornadas = (props) => {
             return (
               <tr className="table-light">
                 <td>{jornada.Id_jornada}</td>
+                <td>
+                  J{jornada.Id_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
+                </td>
                 <td>{jornada.Id_temporada}</td>
                 <td>{jornada.Fecha_inicio}</td>
                 <td>{jornada.Fecha_final}</td>
@@ -44,6 +48,7 @@ export const ListaJornadas = (props) => {
         <thead className="thead-dark">
           <tr>
             <th scope="col">Id jornada</th>
+            <th scope="col">Nombre jornada</th>
             <th scope="col">Id temporada</th>
             <th scope="col">Fecha inicio</th>
             <th scope="col">Fecha final </th>
@@ -54,6 +59,9 @@ export const ListaJornadas = (props) => {
             return (
               <tr className="table-light">
                 <td>{jornada.Id_jornada}</td>
+                <td>
+                  J{jornada.Id_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
+                </td>
                 <td>{jornada.Id_temporada}</td>
                 <td>{jornada.Fecha_inicio}</td>
                 <td>{jornada.Fecha_final}</td>

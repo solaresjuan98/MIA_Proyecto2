@@ -3,6 +3,8 @@ import DateTimePicker from "react-datetime-picker";
 import axios from "axios";
 import moment from "moment";
 import { ListaJornadas } from "./ListaJornadas";
+import { useForm } from "../hooks/useForm";
+import Swal from "sweetalert2";
 
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "week");
@@ -24,6 +26,17 @@ export const JornadasScreen = () => {
     obtenerListaTemporadas();
     obtenerListaJornadas();
   }, []);
+
+  //
+  const [
+    { Id_temporada, FechaInicioJornada, FechaFinJornada },
+    handleInputchange,
+    reset,
+  ] = useForm({
+    Id_temporada: 0,
+    FechaInicioJornada: fechaInicio,
+    FechaFinJornada: fechaFin,
+  });
 
   // ------- OBTENER LISTA DE TEMPORADAS -------
   const obtenerListaTemporadas = () => {
@@ -55,7 +68,20 @@ export const JornadasScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
-  // Filtrar jornadas terminadas
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const nuevaJornada = {
+      id: jornadas.length + 1,
+      //id_temporada: id_temp
+    };
+    // AQUI ME QUEDÉ (PETICION POST)
+    Swal.fire("Aviso", "Jornada creada con exito", "success");
+    // Peticion post 
+    reset();
+  };
+
+  // Filtrar jornadas terminadas (PUEDE SER UTIL PARA FILTRAR Y NO ESTAR HACIENDO TANTA PETICION A LA BD)
   //const jornadasTerminadas = jornadas.filter((jornada) => jornada.Estado === 'Finalizada');
   //console.log(jornadasTerminadas);
 
@@ -69,7 +95,7 @@ export const JornadasScreen = () => {
               <h5 className="card-title">Crear nueva jornada</h5>{" "}
             </div>
             <div className="card-body">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label className="col-form-label">Temporada</label>
                   <select className="custom-select">
@@ -77,7 +103,7 @@ export const JornadasScreen = () => {
                       Selecciona una Temporada...
                     </option>
                     {temporadas.map((temporada) => (
-                      <option key={temporada.Id_temporada}>
+                      <option key={temporada.Id_temporada} value={Id_temporada}>
                         {temporada.Id_temporada}
                       </option>
                     ))}

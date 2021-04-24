@@ -27,6 +27,8 @@ export const TemporadasScreen = () => {
     obtenerListaTemporadas();
   }, []);
 
+  console.log(temporadas);
+
   // ------- OBTENER LISTA DE DEPORTES -------
   const obtenerListaDeportes = () => {
     axios
@@ -82,6 +84,7 @@ export const TemporadasScreen = () => {
                     ))}
                   </select>
                 </div>
+
                 <div className="form-group">
                   <label className="col-form-label" for="inputDefault">
                     Fecha de inicio de la temporada
@@ -104,7 +107,10 @@ export const TemporadasScreen = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <button type="button" className="btn btn-primary mt-3 btn-block">
+                  <button
+                    type="button"
+                    className="btn btn-primary mt-3 btn-block"
+                  >
                     Crear temporada
                   </button>
                 </div>

@@ -57,15 +57,17 @@ type Recompensa struct {
 
 // Temporadas
 type Temporada struct {
-	Id_temporada int    `json:"Id_temporada"`
-	Id_deporte   int    `json:"Id_deporte"`
-	Estado       string `json:"Estado"`
+	Id_temporada     int    `json:"Id_temporada"`
+	Nombre_temporada string `json:"Nombre_temporada"`
+	Id_deporte       int    `json:"Id_deporte"`
+	Estado           string `json:"Estado"`
 }
 
 // Jornadas
 type Jornada struct {
 	Id_jornada   int    `json:"Id_jornada"`
 	Id_temporada int    `json:"Id_temporada"`
+	Anio         string `json:"Anio"`
 	Fecha_inicio string `json:"Fecha_inicio"`
 	Fecha_final  string `json:"Fecha_final"`
 	Estado       string `json:"Estado"`
@@ -305,7 +307,7 @@ func obtenerTemporadas(n int) []Temporada {
 	temporadas := make([]Temporada, 0)
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
-	rows, _ := db.Query("SELECT id_temporada, estado_temporada, id_deporte FROM temporada")
+	rows, _ := db.Query("SELECT id_temporada, nombre_temporada , estado_temporada, id_deporte FROM temporada")
 
 	if err != nil {
 		log.Fatal(err)
@@ -313,7 +315,7 @@ func obtenerTemporadas(n int) []Temporada {
 
 	for rows.Next() {
 		t := new(Temporada)
-		rows.Scan(&t.Id_temporada, &t.Estado, &t.Id_deporte)
+		rows.Scan(&t.Id_temporada, &t.Nombre_temporada, &t.Estado, &t.Id_deporte)
 		temporadas = append(temporadas, *t) //
 	}
 
@@ -340,7 +342,8 @@ func obtenerJornadas(n int) []Jornada {
 
 	jornadas := make([]Jornada, 0)
 	// CONSULTA SQL
-	query := "SELECT ID_JORNADA, ID_TEMPORADA, CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO, CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN, ESTADO_JORNADA FROM JORNADA"
+	query := "SELECT ID_JORNADA,ID_TEMPORADA,CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO,CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_fin_jornada) as ANIO_INICIO, ESTADO_JORNADA FROM JORNADA"
+	//query := "SELECT ID_JORNADA, ID_TEMPORADA, CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO, CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN, ESTADO_JORNADA FROM JORNADA"
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
 	rows, _ := db.Query(query)
@@ -351,7 +354,7 @@ func obtenerJornadas(n int) []Jornada {
 
 	for rows.Next() {
 		j := new(Jornada)
-		rows.Scan(&j.Id_jornada, &j.Id_temporada, &j.Fecha_inicio, &j.Fecha_final, &j.Estado)
+		rows.Scan(&j.Id_jornada, &j.Id_temporada, &j.Fecha_inicio, &j.Fecha_final, &j.Anio, &j.Estado)
 		jornadas = append(jornadas, *j)
 	}
 
