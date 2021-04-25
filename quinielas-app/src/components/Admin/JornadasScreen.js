@@ -6,6 +6,7 @@ import { ListaJornadas } from "./ListaJornadas";
 import { useForm } from "../hooks/useForm";
 import Swal from "sweetalert2";
 
+// Setear las fecha de inicio y de fin de la jornada
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "week");
 
@@ -16,6 +17,9 @@ export const JornadasScreen = () => {
 
   // Estado temporadas
   const [temporadas, obtenerTemporadas] = useState([]);
+
+  const [idTemporada, setIdTemporada] = useState(temporadas);
+
   // Estado jornadas
   const [jornadas, obtenerJornadas] = useState([]);
 
@@ -49,12 +53,17 @@ export const JornadasScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
+  const handleIdTemporadaChange = (e) => {
+    setIdTemporada(e.target.value);
+    //console.log(e.target.value)
+  };
+
   const handleInicioJornadaChange = (e) => {
-    console.log(e);
+    setFechaInicio(e);
   };
 
   const handleFinJornadaChange = (e) => {
-    console.log(e);
+    setFechaFin(e);
   };
 
   // ------- OBTENER LISTA DE JORNADAS -------
@@ -72,12 +81,18 @@ export const JornadasScreen = () => {
     e.preventDefault();
 
     const nuevaJornada = {
-      id: jornadas.length + 1,
-      //id_temporada: id_temp
+      id: parseInt(idTemporada),
+      Fecha_inicio: moment(fechaInicio).format("l"),
+      Fecha_fin: moment(fechaFin).format("l"),
     };
-    // AQUI ME QUEDÉ (PETICION POST)
+
+    //console.log(Id_temporada);
+    console.log(nuevaJornada);
+
+    // Peticion post en axios
+
     Swal.fire("Aviso", "Jornada creada con exito", "success");
-    // Peticion post 
+
     reset();
   };
 
@@ -98,12 +113,15 @@ export const JornadasScreen = () => {
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label className="col-form-label">Temporada</label>
-                  <select className="custom-select">
+                  <select
+                    className="custom-select"
+                    onChange={handleIdTemporadaChange}
+                  >
                     <option selected="custom-select">
                       Selecciona una Temporada...
                     </option>
                     {temporadas.map((temporada) => (
-                      <option key={temporada.Id_temporada} value={Id_temporada}>
+                      <option key={temporada.Id_temporada}>
                         {temporada.Id_temporada}
                       </option>
                     ))}

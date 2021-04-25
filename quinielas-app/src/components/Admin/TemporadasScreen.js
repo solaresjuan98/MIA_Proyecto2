@@ -3,31 +3,47 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DateTimePicker from "react-datetime-picker";
 import { ListaTemporadas } from "./ListaTemporadas";
+import Swal from "sweetalert2";
+import { useForm } from "../hooks/useForm";
 
 // configurar Fecha de inicio y fecha de fin de la temporada
 
 // fecha de inicio de temporadas
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "months");
-const fechaprueba = moment(fin).format("l");
 
 export const TemporadasScreen = () => {
-  // estado de las fechas
+  // Estado de las fechas
   const [fechaInicio, setFechaInicio] = useState(ahora.toDate());
   const [fechaFin, setFechaFin] = useState(fin.toDate());
   // Estado de deportes
   const [deportes, obtenerDeportes] = useState([]); // iniciar como un arreglo
+  // Estado de deporte
+  const [deporte, setDeporte] = useState(deportes);
   // Estado de temporadas
   const [temporadas, obtenerTemporadas] = useState([]);
+
+  const [{ Nombre }, handleInputChange, reset] = useForm({
+    Nombre: "",
+    /*Fecha_inicio: fechaInicio,
+    Fecha_final: fechaFin,*/
+  });
 
   const url = "http://localhost:4000/";
 
   useEffect(() => {
     obtenerListaDeportes();
     obtenerListaTemporadas();
+
+    const interval = setInterval(() => {
+      obtenerListaDeportes();
+      obtenerListaTemporadas();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  console.log(temporadas);
+  //console.log(temporadas);
 
   // ------- OBTENER LISTA DE DEPORTES -------
   const obtenerListaDeportes = () => {
@@ -41,17 +57,6 @@ export const TemporadasScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
-  console.log(fechaprueba);
-  // manejar la fecha de inicio y la fecha de fin de la temporada
-  const handleFechaInicioTemporadaChange = (e) => {
-    console.log(e);
-    //console.log(ahora.format('l'));
-  };
-
-  const handleFechaFinTemporadaChange = (e) => {
-    console.log(e);
-  };
-
   // ------- OBTENER LISTA DE TEMPORADAS -------
   const obtenerListaTemporadas = () => {
     axios
@@ -63,6 +68,47 @@ export const TemporadasScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
+  // Manejar datos de formulario
+
+  const handleDeporteChange = (e) => {
+    //console.log(e.target.value);
+    setDeporte(e.target.value);
+  };
+  // manejar la fecha de inicio y la fecha de fin de la temporada
+  const handleFechaInicioTemporadaChange = (e) => {
+    //console.log(e);
+    setFechaInicio(e);
+    //console.log(ahora.format('l'));
+  };
+
+  const handleFechaFinTemporadaChange = (e) => {
+    //console.log(e);
+    setFechaFin(e);
+  };
+
+  // Enviar formulario
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+
+    const nuevaTemporada = {
+      Nombre: deporte,
+      Fecha_inicio: moment(fechaInicio).format("L"),
+      Fecha_fin: moment(fechaFin).format("L"),
+    };
+
+    console.log(nuevaTemporada);
+    //console.log(deporte);
+    /*await axios
+      .post(`${url}crearTemporada`, nuevaTemporada)
+      .then((res) => {
+        //console.log(res);
+        console.log(res);
+      })
+      .catch((err) => console.error(err));*/
+
+    Swal.fire("Aviso", "Temporada creada con exito", "success");
+  };
+
   return (
     <div className="container mt-5">
       <div className="row">
@@ -72,15 +118,21 @@ export const TemporadasScreen = () => {
               <h5 className="card-title">Crear nueva temporada</h5>{" "}
             </div>
             <div className="card-body">
-              <form>
+              <form onSubmit={handleSubmitForm}>
                 <div className="form-group">
                   <label className="col-form-label" for="inputDefault">
                     Deporte:
                   </label>
-                  <select className="custom-select">
+                  <select
+                    className="custom-select"
+                    onChange={handleDeporteChange}
+                    value={deporte}
+                  >
                     <option selected="">Selecciona un deporte...</option>
-                    {deportes.map((deporte) => (
-                      <option key={deporte.Id_deporte}>{deporte.Nombre}</option>
+                    {deportes.map((deporte, i) => (
+                      <option key={i}>
+                        {deporte.Nombre}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -101,15 +153,15 @@ export const TemporadasScreen = () => {
                   </label>
                   <DateTimePicker
                     onChange={handleFechaFinTemporadaChange}
-                    minDate={fechaInicio}
                     value={fechaFin}
+                    minDate={fechaInicio}
                     className="form-control"
                   />
                 </div>
                 <div className="form-group">
                   <button
-                    type="button"
-                    className="btn btn-primary mt-3 btn-block"
+                    type="submit"
+                    className="btn btn-primary mt-3 btn-block mt-1"
                   >
                     Crear temporada
                   </button>

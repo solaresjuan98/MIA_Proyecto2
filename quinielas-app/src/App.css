@@ -1,5 +1,9 @@
 body {
-  background-color: rgb(188, 225, 255);
+  /*background-color: rgb(188, 225, 255);*/
+  background: rgb(105,189,177);
+  background: radial-gradient(circle, rgba(105,189,177,1) 0%, rgba(113,146,184,1) 100%);
+  /*background: rgb(208,255,250);
+  background: radial-gradient(circle, rgba(208,255,250,1) 0%, rgba(113,146,184,1) 100%);*/
 }
 
 /*Calendar styles*/
