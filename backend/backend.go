@@ -58,9 +58,13 @@ type Recompensa struct {
 // Temporadas
 type Temporada struct {
 	Id_temporada     int    `json:"Id_temporada"`
+	Deporte          string `json:"Deporte"`
 	Nombre_temporada string `json:"Nombre_temporada"`
 	Id_deporte       int    `json:"Id_deporte"`
 	Estado           string `json:"Estado"`
+	Anio             string `json:"Anio"`
+	Fecha_inicio     string `json:"Fecha_inicio"`
+	Fecha_final      string `json:"Fecha_fin"`
 }
 
 // Jornadas
@@ -306,16 +310,30 @@ func obtenerTemporadas(n int) []Temporada {
 
 	temporadas := make([]Temporada, 0)
 
+	/*query := `SELECT ID_TEMPORADA,
+	nombre_deporte,
+	CAST(fecha_inicio AS VARCHAR2(30)) AS FECHA_INICIO,
+	CAST(fecha_final AS VARCHAR2(30))  AS FECHA_FIN,
+	EXTRACT(YEAR FROM fecha_inicio)    as ANIO_INICIO,
+	estado_temporada
+	FROM TEMPORADA, DEPORTE`
+	*/
+
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
-	rows, _ := db.Query("SELECT id_temporada, nombre_temporada , estado_temporada, id_deporte FROM temporada")
+	//rows, _ := db.Query("SELECT id_temporada, nombre_temporada , estado_temporada, id_deporte FROM temporada")
+	rows, _ := db.Query("SELECT ID_TEMPORADA, ID_DEPORTE ,CAST(fecha_inicio AS VARCHAR2(30)) AS FECHA_INICIO,CAST(fecha_final AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_inicio) as ANIO_INICIO, estado_temporada FROM TEMPORADA")
+	//rows, _ := db.Query(query)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	defer db.Close()
+
 	for rows.Next() {
 		t := new(Temporada)
-		rows.Scan(&t.Id_temporada, &t.Nombre_temporada, &t.Estado, &t.Id_deporte)
+		rows.Scan(&t.Id_temporada, &t.Id_deporte, &t.Fecha_inicio, &t.Fecha_final, &t.Anio, &t.Estado)
+		//rows.Scan(&t.Id_temporada, &t.Nombre_temporada, &t.Estado, &t.Id_deporte)
 		temporadas = append(temporadas, *t) //
 	}
 
@@ -364,6 +382,36 @@ func obtenerJornadas(n int) []Jornada {
 
 // ------------------------------------- PETICIONES POST ---------------------------------------------------
 
+// -------------- CREAR TEMPORADA --------------
+func crearTemporadaRouter(w http.ResponseWriter, r *http.Request) {
+
+	var nuevaTemporada Temporada
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &nuevaTemporada)
+
+	res, err := db.Exec("INSERT INTO TEMPORADA(FECHA_INICIO, FECHA_FINAL, ESTADO_TEMPORADA, ID_DEPORTE) values (TO_DATE('" + nuevaTemporada.Fecha_inicio + "', 'dd/mm/yyyy'), TO_DATE('" + nuevaTemporada.Fecha_final + "', 'dd/mm/yyyy'), 'Activo', (SELECT ID_DEPORTE FROM DEPORTE WHERE NOMBRE_DEPORTE = '" + nuevaTemporada.Deporte + "'))")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(nuevaTemporada.Fecha_inicio)
+	fmt.Println(nuevaTemporada.Deporte)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(nuevaTemporada)
+	fmt.Println(res.LastInsertId())
+}
+
 // -------------- CREAR DEPORTE --------------
 func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 
@@ -393,8 +441,10 @@ func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// ---------------- esto no funciona
+
 func setupCorsResponse(w *http.ResponseWriter, req *http.Request) {
-	fmt.Println(".l.")
+
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
@@ -449,7 +499,7 @@ func main() {
 
 	defer db.Close()
 
-	// RUTAS DE PRUEBA
+	// RUTAS DE PRUEBA - SIN BASE DE DATOS
 	router.HandleFunc("/", indexRoute)
 	router.HandleFunc("/tasks", getTasks).Methods("GET")
 	router.HandleFunc("/tasks", createTasks).Methods("POST")
@@ -466,7 +516,8 @@ func main() {
 	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")
 
 	// Peticiones POST
-	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")
+	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")     // Crear deporte
+	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST") // Crear temporada
 
 	// Peticiones DELETE (aun no funciona)
 	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")
