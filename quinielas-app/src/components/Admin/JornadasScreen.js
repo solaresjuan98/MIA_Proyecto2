@@ -3,12 +3,18 @@ import DateTimePicker from "react-datetime-picker";
 import axios from "axios";
 import moment from "moment";
 import { ListaJornadas } from "./ListaJornadas";
-import { useForm } from "../hooks/useForm";
+//import { useForm } from "../hooks/useForm";
 import Swal from "sweetalert2";
 
-// Setear las fecha de inicio y de fin de la jornada
+// Definir las fecha de inicio y de fin por defecto de la jornada
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "week");
+
+const jornadaInicial = {
+  Id_temporada: 0,
+  Fecha_inicio: moment(ahora).format("L"),
+  Fecha_final: moment(fin).format("L"),
+};
 
 export const JornadasScreen = () => {
   // Estado de las fechas
@@ -23,24 +29,25 @@ export const JornadasScreen = () => {
   // Estado jornadas
   const [jornadas, obtenerJornadas] = useState([]);
 
+  // Formulario
+  const [formValues, setFormValues] = useState(jornadaInicial);
+
+  //const { Fecha_inicio, Fecha_fin } = formValues;
+
   // URL DE LA API
   const url = "http://localhost:4000/";
 
   useEffect(() => {
     obtenerListaTemporadas();
     obtenerListaJornadas();
-  }, []);
 
-  //
-  const [
-    { Id_temporada, FechaInicioJornada, FechaFinJornada },
-    handleInputchange,
-    reset,
-  ] = useForm({
-    Id_temporada: 0,
-    FechaInicioJornada: fechaInicio,
-    FechaFinJornada: fechaFin,
-  });
+    const interval = setInterval(() => {
+      obtenerListaJornadas();
+      obtenerListaTemporadas();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // ------- OBTENER LISTA DE TEMPORADAS -------
   const obtenerListaTemporadas = () => {
@@ -55,20 +62,34 @@ export const JornadasScreen = () => {
 
   const handleIdTemporadaChange = (e) => {
     setIdTemporada(e.target.value);
-    //console.log(e.target.value)
+    console.log(e.target.value);
+    setFormValues({
+      ...formValues,
+      Id_temporada: parseInt(e.target.value), // Convertir a numero
+    });
   };
 
   const handleInicioJornadaChange = (e) => {
     setFechaInicio(e);
+
+    setFormValues({
+      ...formValues,
+      Fecha_inicio: moment(e).format("L"),
+    });
   };
 
   const handleFinJornadaChange = (e) => {
     setFechaFin(e);
+
+    setFormValues({
+      ...formValues,
+      Fecha_final: moment(e).format("L"),
+    });
   };
 
   // ------- OBTENER LISTA DE JORNADAS -------
-  const obtenerListaJornadas = () => {
-    axios
+  const obtenerListaJornadas = async () => {
+    await axios
       .get(`${url}jornadas`)
       .then((response) => {
         const listaJornadas = response.data;
@@ -77,23 +98,34 @@ export const JornadasScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const nuevaJornada = {
-      id: parseInt(idTemporada),
-      Fecha_inicio: moment(fechaInicio).format("l"),
-      Fecha_fin: moment(fechaFin).format("l"),
-    };
+    /*const momentoInicio = moment(Fecha_inicio);
+    const momentoFin = moment(Fecha_fin);
+    console.log(momentoInicio);
+    console.log(momentoFin);*/
 
-    //console.log(Id_temporada);
-    console.log(nuevaJornada);
+    /*if (momentoInicio.isSameOrAfter(momentoFin)) {
+      Swal.fire(
+        "Error",
+        "La fecha de inicio tiene que ser antes que la de fin",
+        "error"
+      );
+      return;
+    }*/
+    console.log(formValues);
 
     // Peticion post en axios
+    await axios
+      .post(`${url}crearJornada`, formValues)
+      .then((res) => {
+        console.log(res);
+        console.log(res.data);
+      })
+      .catch((err) => console.error(err));
 
     Swal.fire("Aviso", "Jornada creada con exito", "success");
-
-    reset();
   };
 
   // Filtrar jornadas terminadas (PUEDE SER UTIL PARA FILTRAR Y NO ESTAR HACIENDO TANTA PETICION A LA BD)
@@ -116,14 +148,13 @@ export const JornadasScreen = () => {
                   <select
                     className="custom-select"
                     onChange={handleIdTemporadaChange}
+                    value={idTemporada}
                   >
                     <option selected="custom-select">
                       Selecciona una Temporada...
                     </option>
-                    {temporadas.map((temporada) => (
-                      <option key={temporada.Id_temporada}>
-                        {temporada.Id_temporada}
-                      </option>
+                    {temporadas.map((temporada, i) => (
+                      <option key={i}>{temporada.Id_temporada}</option>
                     ))}
                   </select>
                 </div>
@@ -144,7 +175,7 @@ export const JornadasScreen = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <button class="btn btn-primary btn-block">
+                  <button className="btn btn-primary btn-block">
                     Crear jornada
                   </button>
                 </div>

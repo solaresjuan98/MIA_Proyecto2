@@ -4,13 +4,16 @@ import axios from "axios";
 import DateTimePicker from "react-datetime-picker";
 import { ListaTemporadas } from "./ListaTemporadas";
 import Swal from "sweetalert2";
-import { useForm } from "../hooks/useForm";
 
-// configurar Fecha de inicio y fecha de fin de la temporada
-
-// fecha de inicio de temporadas
+// configurar Fecha de inicio y fecha de fin por defecto de la temporada
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "months");
+
+const temporadaInicial = {
+  Deporte: "",
+  Fecha_inicio: moment(ahora).format("L"),
+  Fecha_fin: moment(fin).format("L"),
+};
 
 export const TemporadasScreen = () => {
   // Estado de las fechas
@@ -23,12 +26,9 @@ export const TemporadasScreen = () => {
   // Estado de temporadas
   const [temporadas, obtenerTemporadas] = useState([]);
 
-  const [{ Nombre }, handleInputChange, reset] = useForm({
-    Nombre: "",
-    /*Fecha_inicio: fechaInicio,
-    Fecha_final: fechaFin,*/
-  });
+  const [formValues, setFormValues] = useState(temporadaInicial);
 
+  // URL de api
   const url = "http://localhost:4000/";
 
   useEffect(() => {
@@ -69,42 +69,52 @@ export const TemporadasScreen = () => {
   };
 
   // Manejar datos de formulario
-
   const handleDeporteChange = (e) => {
     //console.log(e.target.value);
     setDeporte(e.target.value);
-  };
-  // manejar la fecha de inicio y la fecha de fin de la temporada
-  const handleFechaInicioTemporadaChange = (e) => {
-    //console.log(e);
-    setFechaInicio(e);
-    //console.log(ahora.format('l'));
+
+    setFormValues({
+      ...formValues,
+      Deporte: e.target.value,
+    });
   };
 
+  // manejar la fecha de inicio en el formulario
+  const handleFechaInicioTemporadaChange = (e) => {
+    setFechaInicio(e);
+    //console.log(moment(e).format("L"))
+    setFormValues({
+      ...formValues,
+      Fecha_inicio: moment(e).format("L"),
+    });
+  };
+
+  // manejar la fecha de fin en el formulario
   const handleFechaFinTemporadaChange = (e) => {
     //console.log(e);
     setFechaFin(e);
+
+    setFormValues({
+      ...formValues,
+      Fecha_fin: moment(e).format("L"),
+    });
   };
 
   // Enviar formulario
   const handleSubmitForm = async (e) => {
     e.preventDefault();
 
-    const nuevaTemporada = {
-      Nombre: deporte,
-      Fecha_inicio: moment(fechaInicio).format("L"),
-      Fecha_fin: moment(fechaFin).format("L"),
-    };
+    // moment(fin).format("L")
 
-    console.log(nuevaTemporada);
-    //console.log(deporte);
-    /*await axios
-      .post(`${url}crearTemporada`, nuevaTemporada)
+    console.log(formValues);
+
+    await axios
+      .post(`${url}crearTemporada`, formValues)
       .then((res) => {
         //console.log(res);
         console.log(res);
       })
-      .catch((err) => console.error(err));*/
+      .catch((err) => console.error(err));
 
     Swal.fire("Aviso", "Temporada creada con exito", "success");
   };
@@ -130,9 +140,7 @@ export const TemporadasScreen = () => {
                   >
                     <option selected="">Selecciona un deporte...</option>
                     {deportes.map((deporte, i) => (
-                      <option key={i}>
-                        {deporte.Nombre}
-                      </option>
+                      <option key={i}>{deporte.Nombre}</option>
                     ))}
                   </select>
                 </div>

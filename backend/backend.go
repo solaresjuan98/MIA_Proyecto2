@@ -321,7 +321,7 @@ func obtenerTemporadas(n int) []Temporada {
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
 	//rows, _ := db.Query("SELECT id_temporada, nombre_temporada , estado_temporada, id_deporte FROM temporada")
-	rows, _ := db.Query("SELECT ID_TEMPORADA, ID_DEPORTE ,CAST(fecha_inicio AS VARCHAR2(30)) AS FECHA_INICIO,CAST(fecha_final AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_inicio) as ANIO_INICIO, estado_temporada FROM TEMPORADA")
+	rows, _ := db.Query("SELECT ID_TEMPORADA, ID_DEPORTE ,CAST(fecha_inicio AS VARCHAR2(30)) AS FECHA_INICIO,CAST(fecha_final AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_inicio) as ANIO_INICIO, estado_temporada FROM TEMPORADA order by ID_TEMPORADA asc")
 	//rows, _ := db.Query(query)
 
 	if err != nil {
@@ -360,7 +360,7 @@ func obtenerJornadas(n int) []Jornada {
 
 	jornadas := make([]Jornada, 0)
 	// CONSULTA SQL
-	query := "SELECT ID_JORNADA,ID_TEMPORADA,CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO,CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_fin_jornada) as ANIO_INICIO, ESTADO_JORNADA FROM JORNADA"
+	query := "SELECT ID_JORNADA,ID_TEMPORADA,CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO,CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_fin_jornada) as ANIO_INICIO, ESTADO_JORNADA FROM JORNADA ORDER BY ID_JORNADA ASC"
 	//query := "SELECT ID_JORNADA, ID_TEMPORADA, CAST(FECHA_INICIO_JORNADA AS VARCHAR2(30)) AS FECHA_INICIO, CAST(FECHA_FIN_JORNADA AS VARCHAR2(30)) AS FECHA_FIN, ESTADO_JORNADA FROM JORNADA"
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
@@ -369,6 +369,8 @@ func obtenerJornadas(n int) []Jornada {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer db.Close()
 
 	for rows.Next() {
 		j := new(Jornada)
@@ -410,6 +412,40 @@ func crearTemporadaRouter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(nuevaTemporada)
 	fmt.Println(res.LastInsertId())
+}
+
+// -------------- CREAR JORNADA --------------
+func crearJornadaRouter(w http.ResponseWriter, r *http.Request) {
+
+	var nuevaJornada Jornada
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &nuevaJornada)
+	fmt.Println(nuevaJornada.Id_temporada)
+	fmt.Println(nuevaJornada.Fecha_inicio)
+	fmt.Println(nuevaJornada.Fecha_final)
+	res, err := db.Exec("INSERT INTO JORNADA(ID_TEMPORADA, FECHA_INICIO_JORNADA, FECHA_FIN_JORNADA, ESTADO_JORNADA) VALUES (" + strconv.Itoa(nuevaJornada.Id_temporada) + ", TO_DATE('" + nuevaJornada.Fecha_inicio + "', 'dd/mm/yyyy'), TO_DATE('" + nuevaJornada.Fecha_final + "', 'dd/mm/yyyy'), 'Activa')")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(nuevaJornada)
+	fmt.Println(res.LastInsertId())
+
 }
 
 // -------------- CREAR DEPORTE --------------
@@ -518,6 +554,7 @@ func main() {
 	// Peticiones POST
 	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")     // Crear deporte
 	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST") // Crear temporada
+	router.HandleFunc("/crearJornada", crearJornadaRouter).Methods("POST")     // Crear jornada
 
 	// Peticiones DELETE (aun no funciona)
 	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")

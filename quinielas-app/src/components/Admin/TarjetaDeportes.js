@@ -1,7 +1,6 @@
 import React from "react";
-import axios from 'axios'
-import Swal from 'sweetalert2'
-
+//import axios from 'axios'
+//import Swal from 'sweetalert2'
 
 export const TarjetaDeportes = (props) => {
   const { deportes } = props;

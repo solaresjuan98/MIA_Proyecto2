@@ -2,7 +2,7 @@ import React from "react";
 
 export const ListaJornadas = (props) => {
   const { jornadas } = props;
-
+  //console.log(jornadas)
   // Filtrar jornadas finalizadas
   const jornadasTerminadas = jornadas.filter(
     (jornada) => jornada.Estado === "Finalizada"
@@ -30,7 +30,7 @@ export const ListaJornadas = (props) => {
         <tbody>
           {jornadasActivas.map((jornada, i) => {
             return (
-              <tr className="table-light">
+              <tr className="table-light" key={i}>
                 <td>{jornada.Id_jornada}</td>
                 <td>
                   J{jornada.Id_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
@@ -57,7 +57,7 @@ export const ListaJornadas = (props) => {
         <tbody>
           {jornadasTerminadas.map((jornada, i) => {
             return (
-              <tr className="table-light">
+              <tr className="table-light" key={i}>
                 <td>{jornada.Id_jornada}</td>
                 <td>
                   J{jornada.Id_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
