@@ -10,6 +10,7 @@ import axios from "axios";
 
 // La fecha de nacimiento tiene que ser mayor o igual a 18 años antes del dia de hoy
 const fecha_Nacimiento = moment().minutes(0).seconds(0).subtract(18, "years");
+const fecha_maxima = moment().minutes(0).seconds(0).subtract(18, "years");
 
 // Usuario
 const usuarioNuevo = {
@@ -30,12 +31,13 @@ const usuarioLogin = {
 };
 
 export const Login = ({ history }) => {
+  const url = "http://localhost:4000/";
   const { dispatch } = useContext(AuthContext);
 
   // Estado para login de usuario
   const [nicknameLogin, setNicknameLogin] = useState("");
   const [contraseniaLogin, setContraseniaLogin] = useState("");
-  const [rolLogin, setRolLogin] = useState("");
+  //const [rolLogin, setRolLogin] = useState("");
 
   // Estado de datos para creacion de usuario
   const [nombreUsuario, setNombreUsuario] = useState("");
@@ -46,10 +48,15 @@ export const Login = ({ history }) => {
   const [imageUrl, setImageUrl] = useState("");
   const [imagenSeleccionada, setImagenSeleccionada] = useState("");
 
+  // Validacion de formulario de login
+  const [usrLoginValid, setUsrLoginValid] = useState(true);
+  const [pwdLoginValid, setPwdLoginValid] = useState(true);
+
   // Estado de la fecha de nacimiento
   const [fechaNacimiento, setFechaNacimiento] = useState(
     fecha_Nacimiento.toDate()
   );
+  const [fechaMax, setFechaMax] = useState(fecha_maxima.toDate());
 
   // DATOS DEL FORMULARIO PARA LOGIN
   const [loginFormValues, setLoginFormValues] = useState(usuarioLogin);
@@ -82,7 +89,8 @@ export const Login = ({ history }) => {
   };
 
   // --------- Función de login ---------
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
     /*
         solo se puede iniciar sesion de dos formas:
           - como admin
@@ -90,6 +98,12 @@ export const Login = ({ history }) => {
     */
 
     const { Nickname_login, Contrasenia_login } = loginFormValues;
+
+    if (Nickname_login.trim().length < 2) {
+      return setUsrLoginValid(false);
+    } else if (contraseniaLogin.trim().length < 2) {
+      return setPwdLoginValid(false);
+    }
 
     if (Nickname_login === "Administrador" && Contrasenia_login === "admin") {
       rolUsuario = "administrador";
@@ -191,11 +205,33 @@ export const Login = ({ history }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log(formValues);
     Swal.fire("Aviso", "Usuario creado con exito", "success");
+    /* 
+    const {
+      Nombre_usuario,
+      Apellido_usuario,
+      nickname,
+      Contrasenia,
+    } = formValues;
+    */
+    await axios
+      .post(`${url}registroCliente`, formValues)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.log(err));
+
+    // Reiniciando formulario
+    setNombreUsuario("");
+    setApellidoUsuario("");
+    setNickname("");
+    setCorreo("");
+    setContrasenia("");
+    setFechaNacimiento(fecha_maxima.toDate());
     //reset();
   };
 
@@ -212,21 +248,27 @@ export const Login = ({ history }) => {
             <div className="form-group">
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${!usrLoginValid && "is-invalid"}`}
                 placeholder="Nickname"
                 autoComplete="off"
                 onChange={handleNicknameUsuarioChange}
                 value={nicknameLogin}
               />
+              {!usrLoginValid && (
+                <div className="invalid-feedback">Rellena el campo</div>
+              )}
             </div>
             <div className="form-group">
               <input
                 type="password"
-                className="form-control"
+                className={`form-control ${!pwdLoginValid && "is-invalid"}`}
                 placeholder="Contraseña"
                 onChange={handleContraseniaLoginChange}
                 value={contraseniaLogin}
               />
+              {!pwdLoginValid && (
+                <div className="invalid-feedback">Rellena el campo</div>
+              )}
             </div>
             <div className="form-group">
               <button
@@ -296,7 +338,7 @@ export const Login = ({ history }) => {
               <DateTimePicker
                 onChange={handleFechaNacimientoChange}
                 value={fechaNacimiento}
-                maxDate={fechaNacimiento}
+                maxDate={fechaMax}
                 className="form-control"
               />
             </div>

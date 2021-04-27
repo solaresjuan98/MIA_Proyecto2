@@ -9,25 +9,34 @@ export const TarjetaDeportes = (props) => {
     console.log(deporteId);
 
     // Ejecutar la peticion delete con axios
-    /*await axios.delete(
-      )*/
   };
 
   if (deportes.length > 0) {
     return deportes.map((deporte, i) => {
       return (
-        <div className="card border-dark mb-3">
-          <div className="card-body">
-            <h4 className="card-title" key={i}>
-              {deporte.Nombre}
-            </h4>
-            <button
-              className="btn btn-danger mt-2"
-              onClick={() => handleDelete(deporte.Id_deporte)}
-            >
-              Eliminar deporte
-            </button>
-            <p className="card-text"></p>
+        <div
+          className="card border-dark mb-3"
+          style={{ backgroundColor: deporte.Color_deporte }}
+        >
+          <div className="row card-body">
+            <div className="col-sm-6">
+              <h5 className="card-title">{deporte.Nombre}</h5>
+              <button
+                className="btn btn-danger"
+                onClick={() => handleDelete(deporte.Id_deporte)}
+              >
+                Eliminar deporte
+              </button>
+            </div>
+            {deporte.Foto_deporte !== "" ? (
+              <img
+                className="col-sm-6"
+                src={deporte.Foto_deporte}
+                alt="Card cap"
+              />
+            ) : (
+              <span>No hay imagen disponible :(</span>
+            )}
           </div>
         </div>
       );

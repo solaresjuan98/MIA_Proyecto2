@@ -34,6 +34,16 @@ type People struct {
 // ---- END TEST STRUTS ----
 
 // DB STRUCTS
+// Usuario
+type Usuario struct {
+	Nombre_usuario     string `json:"Nombre_usuario"`
+	Apellido_usuario   string `json:"Apellido_usuario"`
+	Nickname           string `json:"Nickname"`
+	Correo_electronico string `json:"Correo_electronico"`
+	Contrasenia        string `json:"Contrasenia"`
+	Fecha_nacimiento   string `json:"Fecha_nacimiento"`
+	Foto_perfil        string `json:"Foto_perfil"`
+}
 
 // Tier
 type Tier struct {
@@ -43,8 +53,10 @@ type Tier struct {
 
 // Deportes
 type Deporte struct {
-	Id_Deporte int    `json:"Id_deporte"`
-	Nombre     string `json:"Nombre"`
+	Id_Deporte    int    `json:"Id_deporte"`
+	Nombre        string `json:"Nombre"`
+	Color_deporte string `json:"Color_deporte"`
+	Foto_deporte  string `json:"Foto_deporte"`
 }
 
 // Recompensas
@@ -272,7 +284,7 @@ func obtenerDeportes(n int) []Deporte {
 	deportes := make([]Deporte, 0)
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
-	rows, _ := db.Query("SELECT id_deporte, nombre_deporte FROM deporte")
+	rows, _ := db.Query("SELECT id_deporte, nombre_deporte, foto_deporte, color FROM deporte order by NOMBRE_DEPORTE asc")
 
 	if err != nil {
 		log.Fatal(err)
@@ -282,7 +294,7 @@ func obtenerDeportes(n int) []Deporte {
 
 	for rows.Next() {
 		d := new(Deporte)
-		rows.Scan(&d.Id_Deporte, &d.Nombre)
+		rows.Scan(&d.Id_Deporte, &d.Nombre, &d.Foto_deporte, &d.Color_deporte)
 		deportes = append(deportes, *d) //
 	}
 
@@ -448,6 +460,41 @@ func crearJornadaRouter(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// -------------- REGISTRAR USUARIO --------------
+func crearClienteRouter(w http.ResponseWriter, r *http.Request) {
+
+	var nuevoUsuario Usuario
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &nuevoUsuario)
+
+	// consulta para crear un cliente
+	queryInsert := `insert into CLIENTES(NOMBRE, APELLIDO, NOMBRE_USUARIO, FECHA_NACIMIENTO, FECHA_REGISTRO, CORREO_ELECTRONICO,
+		FOTO_PERFIL, CONTRASENIA) values('` + nuevoUsuario.Nombre_usuario + `' , '` + nuevoUsuario.Apellido_usuario + `' , '` + nuevoUsuario.Nickname + `', TO_DATE('` + nuevoUsuario.Fecha_nacimiento + `', 'dd/mm/yyyy'),
+		 (select sysdate from dual), '` + nuevoUsuario.Correo_electronico + `', '` + nuevoUsuario.Foto_perfil + `', '` + nuevoUsuario.Contrasenia + `')`
+
+	//fmt.Println(queryInsert)
+	res, err := db.Exec(queryInsert)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(nuevoUsuario)
+	fmt.Println(res.LastInsertId())
+
+}
+
 // -------------- CREAR DEPORTE --------------
 func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 
@@ -462,7 +509,7 @@ func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &nuevoDeporte)
 
-	res, err := db.Exec("INSERT INTO DEPORTE(NOMBRE_DEPORTE) VALUES ('" + nuevoDeporte.Nombre + "')")
+	res, err := db.Exec("INSERT INTO DEPORTE(NOMBRE_DEPORTE,COLOR,FOTO_DEPORTE) VALUES ('" + nuevoDeporte.Nombre + "', '" + nuevoDeporte.Color_deporte + "', '" + nuevoDeporte.Foto_deporte + "' )")
 
 	if err != nil {
 		fmt.Println(err)
@@ -552,6 +599,7 @@ func main() {
 	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")
 
 	// Peticiones POST
+	router.HandleFunc("/registroCliente", crearClienteRouter).Methods("POST")  // Registrarse en el sistema
 	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")     // Crear deporte
 	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST") // Crear temporada
 	router.HandleFunc("/crearJornada", crearJornadaRouter).Methods("POST")     // Crear jornada
