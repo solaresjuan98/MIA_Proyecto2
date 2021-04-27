@@ -8,7 +8,8 @@ import "./Login.css";
 import moment from "moment";
 import axios from "axios";
 
-const fecha_Nacimiento = moment().minutes(0).seconds(0).subtract(1, "hours");
+// La fecha de nacimiento tiene que ser mayor o igual a 18 años antes del dia de hoy
+const fecha_Nacimiento = moment().minutes(0).seconds(0).subtract(18, "years");
 
 // Usuario
 const usuarioNuevo = {
@@ -21,12 +22,22 @@ const usuarioNuevo = {
   Foto_perfil: "",
 };
 
+// Usuario para Login
+const usuarioLogin = {
+  Nickname_login: "",
+  Contrasenia_login: "",
+  Rol_usuario: "",
+};
+
 export const Login = ({ history }) => {
   const { dispatch } = useContext(AuthContext);
 
-  // URL de api
-  //const url = "http://localhost:4000/";
+  // Estado para login de usuario
+  const [nicknameLogin, setNicknameLogin] = useState("");
+  const [contraseniaLogin, setContraseniaLogin] = useState("");
+  const [rolLogin, setRolLogin] = useState("");
 
+  // Estado de datos para creacion de usuario
   const [nombreUsuario, setNombreUsuario] = useState("");
   const [apellidoUsuario, setApellidoUsuario] = useState("");
   const [nickname, setNickname] = useState("");
@@ -40,32 +51,59 @@ export const Login = ({ history }) => {
     fecha_Nacimiento.toDate()
   );
 
+  // DATOS DEL FORMULARIO PARA LOGIN
+  const [loginFormValues, setLoginFormValues] = useState(usuarioLogin);
+
   // --- DATOS DEL FORMULARIO PARA CREAR USUARIO
   const [formValues, setFormValues] = useState(usuarioNuevo);
 
   // -------------------------------
-  const rolUsuario = "administrador";
-  const handleLogin = () => {
-    //history.replace("/adminHome");
+  let rolUsuario = ""; // = "administrador";
 
+  // -------  manejar datos del formulario de login -------
+  // Nickname
+  const handleNicknameUsuarioChange = (e) => {
+    setNicknameLogin(e.target.value);
+    //console.log(e.target.value);
+    setLoginFormValues({
+      ...loginFormValues,
+      Nickname_login: e.target.value,
+    });
+  };
+
+  // Contraseña
+  const handleContraseniaLoginChange = (e) => {
+    setContraseniaLogin(e.target.value);
+    //console.log(e.target.value);
+    setLoginFormValues({
+      ...loginFormValues,
+      Contrasenia_login: e.target.value,
+    });
+  };
+
+  // --------- Función de login ---------
+  const handleLogin = () => {
     /*
-      Membresias de usuario
-       - Gold
-       - Silver
-       - Bronze
+        solo se puede iniciar sesion de dos formas:
+          - como admin
+          - como usuario (gold, silver, bronze o sin membresia)
     */
+
+    const { Nickname_login, Contrasenia_login } = loginFormValues;
+
+    if (Nickname_login === "Administrador" && Contrasenia_login === "admin") {
+      rolUsuario = "administrador";
+    }
 
     dispatch({
       type: types.login,
       payload: {
         id: 23,
-        name: "Administrador",
+        name: Nickname_login,
         rol: rolUsuario,
         membresia: "Silver",
       },
     });
-
-    //history.replace("/adminHome");
 
     if (rolUsuario === "administrador") {
       history.replace("/adminHome");
@@ -74,10 +112,9 @@ export const Login = ({ history }) => {
     }
   };
 
-  // -------  manejar datos del formulario -------
+  // -------  manejar datos del formulario de creacion de usuario -------
   // Nombre
   const handleNombreChange = (e) => {
-    //console.log(e.target.value);
     setNombreUsuario(e.target.value);
 
     setFormValues({
@@ -88,7 +125,6 @@ export const Login = ({ history }) => {
 
   // Apellido
   const handleApellidoChange = (e) => {
-    //console.log(e.target.value);
     setApellidoUsuario(e.target.value);
 
     setFormValues({
@@ -99,7 +135,6 @@ export const Login = ({ history }) => {
 
   // Nickname
   const handleNicknameChange = (e) => {
-    //console.log(e.target.value);
     setNickname(e.target.value);
     setFormValues({
       ...formValues,
@@ -109,7 +144,6 @@ export const Login = ({ history }) => {
 
   // Correo
   const handleCorreoChange = (e) => {
-    //console.log(e.target.value);
     setCorreo(e.target.value);
     setFormValues({
       ...formValues,
@@ -119,7 +153,6 @@ export const Login = ({ history }) => {
 
   // Contrasenia
   const handleContraseniaChange = (e) => {
-    //console.log(e.target.value);
     setContrasenia(e.target.value);
     setFormValues({
       ...formValues,
@@ -127,6 +160,7 @@ export const Login = ({ history }) => {
     });
   };
 
+  // Fecha de nacimiento
   const handleFechaNacimientoChange = (e) => {
     setFechaNacimiento(e);
     setFormValues({
@@ -149,7 +183,7 @@ export const Login = ({ history }) => {
     axios.post(cloudinaryUrl, formData).then((response) => {
       setImageUrl(response.data.secure_url);
       console.log(response.data.secure_url);
-      setImageUrl(response.data.secure_url);
+      //setImageUrl(response.data.secure_url);
       setFormValues({
         ...formValues,
         Foto_perfil: response.data.secure_url,
@@ -180,6 +214,9 @@ export const Login = ({ history }) => {
                 type="text"
                 className="form-control"
                 placeholder="Nickname"
+                autoComplete="off"
+                onChange={handleNicknameUsuarioChange}
+                value={nicknameLogin}
               />
             </div>
             <div className="form-group">
@@ -187,6 +224,8 @@ export const Login = ({ history }) => {
                 type="password"
                 className="form-control"
                 placeholder="Contraseña"
+                onChange={handleContraseniaLoginChange}
+                value={contraseniaLogin}
               />
             </div>
             <div className="form-group">
@@ -257,6 +296,7 @@ export const Login = ({ history }) => {
               <DateTimePicker
                 onChange={handleFechaNacimientoChange}
                 value={fechaNacimiento}
+                maxDate={fechaNacimiento}
                 className="form-control"
               />
             </div>
@@ -270,16 +310,9 @@ export const Login = ({ history }) => {
                     className="custom-file-input"
                     onChange={(event) => {
                       setImagenSeleccionada(event.target.files[0]);
-
-                      /*setFormValues({
-                        ...formValues,
-                        
-                      })*/
                     }}
                   />
-                  <label className="custom-file-label" for="inputGroupFile02">
-                    Choose file
-                  </label>
+                  <label className="custom-file-label">Choose file</label>
                 </div>
                 <div className="input-group-append">
                   <span
