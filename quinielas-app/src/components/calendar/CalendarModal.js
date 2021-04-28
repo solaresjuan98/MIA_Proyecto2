@@ -88,15 +88,17 @@ export const CalendarModal = () => {
       );
     }
 
-    if(title.trim().length < 2){
-        return setTituloValido(false);
+    if (title.trim().length < 2) {
+      return setTituloValido(false);
     }
 
-    // Grabar en SQL
+    // --------------------------------------------------------------------------------------------------------
+    // Peticiones para obtener la data que necesito para crear eventos
+
+    // --------- CREACION DE EVENTOS EN EL MODAL ---------
 
     setTituloValido(true);
     closeModal();
-
   };
 
   return (
@@ -110,9 +112,29 @@ export const CalendarModal = () => {
       overlayClassName="modal-fondo"
       contentLabel="Example Modal"
     >
-      <h1> Nuevo evento </h1>
+      <h3> Nuevo evento </h3>
       <hr />
       <form className="container" onSubmit={handleSubmitForm}>
+        <div className="form-group">
+          <label>Temporada</label>
+          <input
+            className="form-control"
+            type="text"
+            //placeholder="Readonly input here..."
+            readonly={true}
+            value={43}
+          />
+        </div>
+        <div className="form-group">
+          <select
+            className="custom-select"
+
+            //onChange={handleDeporteChange}
+            //value={deporte}
+          >
+            <option selected="">Selecciona una jornada...</option>
+          </select>
+        </div>
         <div className="form-group">
           <label>Fecha y hora inicio</label>
           <DateTimePicker
@@ -132,41 +154,35 @@ export const CalendarModal = () => {
           />
         </div>
 
-        <hr />
         <div className="form-group">
-          <label>Titulo del evento deportivo</label>
+          <label>Equipo / Jugador local</label>
           <input
             type="text"
-            className={`form-control ${!tituloValido && 'is-invalid'}`}
+            className={`form-control ${!tituloValido && "is-invalid"}`}
             placeholder="Título del evento"
             name="title"
             autoComplete="off"
             value={title}
             onChange={handleInputChange}
           />
-          <small id="emailHelp" className="form-text text-muted">
-            Una descripción corta
-          </small>
         </div>
 
         <div className="form-group">
-          <textarea
+          <label>Equipo / Jugador visitante</label>
+          <input
             type="text"
-            className="form-control"
-            placeholder="Notas"
-            rows="5"
-            name="notes"
-            value={notes}
+            className={`form-control ${!tituloValido && "is-invalid"}`}
+            placeholder="Título del evento"
+            name="title"
+            autoComplete="off"
+            value={title}
             onChange={handleInputChange}
-          ></textarea>
-          <small id="emailHelp" className="form-text text-muted">
-            Información adicional
-          </small>
+          />
         </div>
 
         <button type="submit" className="btn btn-outline-primary btn-block">
           <i className="far fa-save"></i>
-          <span> Guardar</span>
+          <span> Crear evento </span>
         </button>
       </form>
     </Modal>

@@ -5,9 +5,10 @@ import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { messages } from "../../helpers/calendar-es";
 import { CalendarEvent } from "./CalendarEvent";
-import { CalendarModal } from "./CalendarModal";
+//import { CalendarModal } from "./CalendarModal";
 import { AuthContext } from "../../Auth/AuthContext";
 import "../../App.css";
+import { AgregarEvento } from "../UI/AgregarEvento";
 
 moment.locale("es");
 const localizer = momentLocalizer(moment);
@@ -89,7 +90,9 @@ export const CalendarScreen = () => {
   return (
     <div>
       {tieneMembresia ? (
-        <div className="container mt-5 calendar-screen">
+        <div className="calendar-screen">
+          <h3 className="mt-2">Temporada: 2021-Q21 </h3>
+          
           <Calendar
             localizer={localizer}
             events={events}
@@ -105,7 +108,9 @@ export const CalendarScreen = () => {
               event: CalendarEvent,
             }}
           />
-          <CalendarModal />
+          {/*<CalendarModal />*/}
+
+          <AgregarEvento />
         </div>
       ) : (
         <h1>Para acceder al calendario, debes tener una membresia activa</h1>
