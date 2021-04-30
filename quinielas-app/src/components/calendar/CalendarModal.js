@@ -24,26 +24,40 @@ const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fechaFinal = ahora.clone().add(1, "hours"); // 1 hora despues del inicio
 
 export const CalendarModal = () => {
+  // Url de API
+  const url = "http://localhost:4000/";
+  const [tituloEvento, setTituloEvento] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [dateStart, setdateStart] = useState(ahora.toDate());
   const [dateEnd, setDateEnd] = useState(fechaFinal.toDate());
   const [tituloValido, setTituloValido] = useState(true);
 
+  // equipo (o jugador) local
+  const [equipoLocal, setEquipoLocal] = useState("");
+  // equipo (o jugador) visitante
+  const [equipoVisitante, setEquipoVisitante] = useState("");
+
   const [formValues, setFormValues] = useState({
-    title: "Evento",
-    notes: "",
-    start: ahora.toDate(),
-    end: fechaFinal.toDate(),
+    Id_temporada: 43,
+    Id_jornada: 43,
+    Titulo_evento: "",
+    Equipo_local: "",
+    Equipo_visitante: "",
+    Fecha_inicio: ahora.toDate(),
+    Fecha_final: fechaFinal.toDate(),
   });
 
-  const { notes, title } = formValues;
+  const { title } = formValues;
 
+  /* 
   const handleInputChange = ({ target }) => {
     setFormValues({
       ...formValues,
       [target.name]: target.value,
     });
   };
+
+  */
 
   const closeModal = () => {
     setModalIsOpen(false);
@@ -55,7 +69,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      start: e,
+      Fecha_inicio: e,
     });
   };
 
@@ -64,7 +78,25 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      end: e,
+      Fecha_final: e.target.value,
+    });
+  };
+
+  const handleEquipoLocalChange = (e) => {
+    setEquipoLocal(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Equipo_local: e.target.value,
+    });
+  };
+
+  const handleEquipoVisitanteChange = (e) => {
+    setEquipoVisitante(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Equipo_visitante: e.target.value,
     });
   };
 
@@ -76,9 +108,14 @@ export const CalendarModal = () => {
     const inicio = moment(ahora);
     const fin = moment(fechaFinal);
 
-    // Imprimir fechas
-    console.log(inicio);
-    console.log(fin);
+    const { Equipo_local, Equipo_visitante } = formValues;
+
+    // aqui me quede
+    setTituloEvento(Equipo_local + " vs " + Equipo_visitante);
+    setFormValues({
+      ...formValues,
+      Titulo_evento: Equipo_local + " vs " + Equipo_visitante,
+    });
 
     if (inicio.isSameOrAfter(fin)) {
       return Swal.fire(
@@ -88,14 +125,10 @@ export const CalendarModal = () => {
       );
     }
 
-    if (title.trim().length < 2) {
-      return setTituloValido(false);
+    if (Equipo_local.trim().length < 2) {
+      //return setTituloValido(false);
     }
-
-    // --------------------------------------------------------------------------------------------------------
-    // Peticiones para obtener la data que necesito para crear eventos
-
-    // --------- CREACION DE EVENTOS EN EL MODAL ---------
+    console.log(formValues);
 
     setTituloValido(true);
     closeModal();
@@ -125,6 +158,7 @@ export const CalendarModal = () => {
             value={43}
           />
         </div>
+
         <div className="form-group">
           <select
             className="custom-select"
@@ -159,11 +193,13 @@ export const CalendarModal = () => {
           <input
             type="text"
             className={`form-control ${!tituloValido && "is-invalid"}`}
-            placeholder="Título del evento"
-            name="title"
+            placeholder="Equipo o jugador local"
+            //name="title"
             autoComplete="off"
-            value={title}
-            onChange={handleInputChange}
+            value={equipoLocal}
+            onChange={handleEquipoLocalChange}
+            //value={title}
+            //onChange={handleInputChange}
           />
         </div>
 
@@ -172,11 +208,13 @@ export const CalendarModal = () => {
           <input
             type="text"
             className={`form-control ${!tituloValido && "is-invalid"}`}
-            placeholder="Título del evento"
+            placeholder="Equipo o jugador visitante"
             name="title"
             autoComplete="off"
-            value={title}
-            onChange={handleInputChange}
+            value={equipoVisitante}
+            onChange={handleEquipoVisitanteChange}
+            //value={title}
+            //onChange={handleInputChange}
           />
         </div>
 
