@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "moment/locale/es";
@@ -9,63 +9,19 @@ import { CalendarEvent } from "./CalendarEvent";
 import { AuthContext } from "../../Auth/AuthContext";
 import "../../App.css";
 import { AgregarEvento } from "../UI/AgregarEvento";
+import axios from "axios";
 
-moment.locale("es");
+moment.locale("en");
 const localizer = momentLocalizer(moment);
 let tieneMembresia = false;
+let events_ = [];
 
-// Ejemplo de eventos ya reales
-const events = [
-  {
-    title: "Barcelona vs Valencia",
-    Id_temporada: 22,
-    Id_jornada: 1,
-    start: moment().toDate(),
-    end: moment().add(2, "hours").toDate(),
-    bgcolor: "#fafafa",
-  },
-  {
-    Id_temporada: 21,
-    Id_jornada: 2,
-    title: "Real Madrid vs Sevilla",
-    start: moment().add(12, "hours").toDate(),
-    end: moment().add(14, "hours").toDate(),
-  }
-  ,
-];
-
-// Example of a list of events
-/*
-const events = [
-  {
-    title: "VARselona vs Real Madrid",
-    start: moment().toDate(),
-    end: moment().add(2, "hours").toDate(),
-    bgcolor: "#fafafa",
-    notes: "Partido de LaLiga",
-    prediccion: "0-2",
-    user: {
-      _id: "123",
-      name: "Juan",
-    },
-  },
-  {
-    title: "Bayern Munich vs PSG",
-    start: moment().add(12, "hours").toDate(),
-    end: moment().add(14, "hours").toDate(),
-    bgcolor: "#ccc",
-    notes: "Partido de UCL",
-    prediccion: "/", // Prediccion no realizada
-    user: {
-      _id: "124",
-      name: "Cecilia",
-    },
-  },
-];*/
-console.log(events);
+// Definir las fecha actual, para dar colores al calendario
+const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 export const CalendarScreen = () => {
+  const url = "http://localhost:4000/";
   const { user } = useContext(AuthContext);
-  console.log(user.membresia);
+  //console.log(user.membresia);
   const tipoMembresia = user.membresia;
   // Validar si es miembro para mostrar el calendariio
   if (
@@ -76,7 +32,32 @@ export const CalendarScreen = () => {
     tieneMembresia = true;
   }
 
-  console.log(tieneMembresia);
+  // Estado de eventos
+  const [eventos, setEventos] = useState([]);
+
+  useEffect(() => {
+    obtenerListaEventos();
+
+    const interval = setInterval(() => {
+      obtenerListaEventos();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  events_ = [...eventos];
+
+  // Formateando las fechas del calendario
+  for (let i = 0; i < events_.length; i++) {
+    events_[i].start = moment(events_[i].start).add(6, "hours").toDate();
+    events_[i].end = moment(events_[i].end).add(6, "hours").toDate();
+  }
+
+  //console.log(events_);
+
+  // alterar fecha de eventos
+  //console.log(moment(events_[0].start).toDate());
+
   const [lastView, setLastView] = useState(
     localStorage.getItem("lastView") || "month"
   );
@@ -96,7 +77,7 @@ export const CalendarScreen = () => {
 
   const eventStyleGetter = (event, start, end, isSelected) => {
     const style = {
-      backgroundColor: "#40CE6F", // Personalizar colores
+      //backgroundColor: "#40CE6F", // Personalizar colores
       borderRAdius: "0px",
       opacity: 0.8,
       display: "block",
@@ -108,29 +89,53 @@ export const CalendarScreen = () => {
     };
   };
 
+  // OBTENER LISTADO DE EVENTOS
+  const obtenerListaEventos = async () => {
+    await axios.get(`${url}eventos`).then((response) => {
+      const listaEventos = response.data;
+      setEventos(listaEventos);
+    });
+  };
+  //console.log(eventos);
+
   return (
     <div>
       {tieneMembresia ? (
-        <div className="calendar-screen">
-          <h3 className="mt-2">Temporada: 2021-Q21 </h3>
+        <div>
+          <form>
+            <div className="form-group ml-3">
+              <label class="col-form-label" for="inputDefault">
+                Ver eventos de temporada...
+              </label>
+              <select className="custom-select">
+                <option>Selecciona una temporada</option>
+              </select>
+            </div>
+            <div className="form-group ml-3">
+              <button className="btn btn-success">Filtrar</button>
+            </div>
+          </form>
+          <div className="calendar-screen">
+            {/*<h3 className="mt-2">Temporada: 2021-Q21 </h3>*/}
 
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            messages={messages}
-            eventPropGetter={eventStyleGetter}
-            onDoubleClickEvent={onDoubleClick}
-            onView={onViewChange}
-            view={lastView}
-            onSelectEvent={onSelectEvent}
-            components={{
-              event: CalendarEvent,
-            }}
-          />
+            <Calendar
+              localizer={localizer}
+              events={events_}
+              startAccessor="start"
+              endAccessor="end"
+              messages={messages}
+              eventPropGetter={eventStyleGetter}
+              onDoubleClickEvent={onDoubleClick}
+              onView={onViewChange}
+              view={lastView}
+              onSelectEvent={onSelectEvent}
+              components={{
+                event: CalendarEvent,
+              }}
+            />
 
-          <AgregarEvento />
+            <AgregarEvento />
+          </div>
         </div>
       ) : (
         <h1>Para acceder al calendario, debes tener una membresia activa</h1>

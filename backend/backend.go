@@ -31,6 +31,18 @@ type People struct {
 	Nombre    string `json:"nombre"`
 }
 
+// esto es de pruebas
+type allTasks []task
+
+// Arreglo de tareas [PRUEBAS]
+var tasks = allTasks{
+	{
+		Id:      1,
+		Name:    "Task One",
+		Content: "Test content",
+	},
+}
+
 // ---- END TEST STRUTS ----
 
 // DB STRUCTS
@@ -109,18 +121,6 @@ type EventoCalendario struct {
 	Equipo_visitante string `json:"Equipo_visitante"`
 	Fecha_inicio     string `json:"start"`
 	Fecha_final      string `json:"end"`
-}
-
-// esto es de pruebas
-type allTasks []task
-
-// Arreglo de tareas [PRUEBAS]
-var tasks = allTasks{
-	{
-		Id:      1,
-		Name:    "Task One",
-		Content: "Test content",
-	},
 }
 
 // ----------- PETICIONES DE PRUEBA -----------
@@ -345,19 +345,9 @@ func obtenerTemporadas(n int) []Temporada {
 
 	temporadas := make([]Temporada, 0)
 
-	/*query := `SELECT ID_TEMPORADA,
-	nombre_deporte,
-	CAST(fecha_inicio AS VARCHAR2(30)) AS FECHA_INICIO,
-	CAST(fecha_final AS VARCHAR2(30))  AS FECHA_FIN,
-	EXTRACT(YEAR FROM fecha_inicio)    as ANIO_INICIO,
-	estado_temporada
-	FROM TEMPORADA, DEPORTE`
-	*/
-
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
 	//rows, _ := db.Query("SELECT id_temporada, nombre_temporada , estado_temporada, id_deporte FROM temporada")
 	rows, _ := db.Query("SELECT ID_TEMPORADA, ID_DEPORTE ,CAST(fecha_inicio AS VARCHAR2(30)) AS FECHA_INICIO,CAST(fecha_final AS VARCHAR2(30)) AS FECHA_FIN,EXTRACT(YEAR FROM fecha_inicio) as ANIO_INICIO, estado_temporada FROM TEMPORADA order by ID_TEMPORADA asc")
-	//rows, _ := db.Query(query)
 
 	if err != nil {
 		log.Fatal(err)
@@ -414,6 +404,50 @@ func obtenerJornadas(n int) []Jornada {
 	}
 
 	return jornadas
+
+}
+
+// ----------- OBTENER EVENTOS -----------
+
+func obtenerEventosRouter(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	eventos := obtenerEventos(limit)
+
+	eventosJSON, _ := json.Marshal(eventos)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(eventosJSON)
+
+}
+
+func obtenerEventos(n int) []EventoCalendario {
+
+	eventos := make([]EventoCalendario, 0)
+
+	query := "SELECT ID_TEMPORADA, ID_JORNADA, NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO FROM EVENTO"
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query(query)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	for rows.Next() {
+		e := new(EventoCalendario)
+		rows.Scan(&e.Id_temporada, &e.Id_jornada, &e.Titulo_evento, &e.Equipo_local, &e.Equipo_visitante, &e.Fecha_inicio, &e.Fecha_final)
+		eventos = append(eventos, *e)
+	}
+
+	return eventos
 
 }
 
@@ -559,17 +593,28 @@ func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	//queryInsert := "INSERT INTO EVENTO(ID_JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO) VALUES ("+nuevoEvento.Id_jornada+","+nuevoEvento.Id_temporada+","+nuevoEvento.Titulo_evento+","+nuevoEvento.Equipo_local+","+nuevoEvento.Equipo_visitante+","+nuevoEvento.Fecha_inicio+
+	json.Unmarshal(reqBody, &nuevoEvento)
 
 	// Aqui me quede
 	queryInsert := `INSERT INTO EVENTO(ID_JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO)
 					VALUES(` + strconv.Itoa(nuevoEvento.Id_jornada) + `, ` + strconv.Itoa(nuevoEvento.Id_temporada) + `, '` + nuevoEvento.Titulo_evento +
-		`', '` + nuevoEvento.Equipo_local + `', '` + nuevoEvento.Equipo_visitante + `', TO_DATE ('` + nuevoEvento.Fecha_inicio + `', 'dd/mm/yyyy')` +
-		`TO_DATE('` + nuevoEvento.Fecha_final + `', 'dd/mm/yy')`
+		`', '` + nuevoEvento.Equipo_local + `', '` + nuevoEvento.Equipo_visitante + `', TO_DATE ('` + nuevoEvento.Fecha_inicio + `', 'MONTH DD, YYYY, HH:MI AM')` +
+		`, TO_DATE('` + nuevoEvento.Fecha_final + `', 'MONTH DD, YYYY, HH:MI AM'))`
 
-	fmt.Println(queryInsert)
+	res, err := db.Exec(queryInsert)
 
-	json.Unmarshal(reqBody, &nuevoEvento)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(nuevoEvento)
+	//fmt.Println(queryInsert)
+	fmt.Println(res.LastInsertId())
+
 }
 
 // ---------------- esto no funciona
@@ -641,10 +686,11 @@ func main() {
 
 	// Peticiones GET
 	router.HandleFunc("/prueba", getPeopleRouter).Methods("GET")
-	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")
-	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")
-	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET")
-	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")
+	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")             // Obtener tipos de membresia
+	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")         // Obtener deportes
+	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET") // Obtener temporadas
+	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")     // Obtener jornadas
+	router.HandleFunc("/eventos", obtenerEventosRouter).Methods("GET")       // Obtener eventos
 
 	// Peticiones POST
 	router.HandleFunc("/registroCliente", crearClienteRouter).Methods("POST")  // Registrarse en el sistema

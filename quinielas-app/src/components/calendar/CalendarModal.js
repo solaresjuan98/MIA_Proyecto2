@@ -59,8 +59,8 @@ export const CalendarModal = () => {
     Titulo_evento: "",
     Equipo_local: "",
     Equipo_visitante: "",
-    Fecha_inicio: moment(ahora.toDate()).format("L"),
-    Fecha_final: moment(fechaFinal.toDate()).format("L"),
+    Fecha_inicio: moment(ahora.toDate()).format("LLL"),
+    Fecha_final: moment(fechaFinal.toDate()).format("LLL"),
   });
 
   const closeModal = () => {
@@ -93,7 +93,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_inicio: moment(e).format("L"),
+      Fecha_inicio: moment(e).format("LLL"),
     });
   };
 
@@ -102,7 +102,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_final: moment(e).format("L"),
+      Fecha_final: moment(e).format("LLL"),
     });
   };
 
