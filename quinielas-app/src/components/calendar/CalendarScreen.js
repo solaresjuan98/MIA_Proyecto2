@@ -14,7 +14,28 @@ moment.locale("es");
 const localizer = momentLocalizer(moment);
 let tieneMembresia = false;
 
+// Ejemplo de eventos ya reales
+const events = [
+  {
+    title: "Barcelona vs Valencia",
+    Id_temporada: 22,
+    Id_jornada: 1,
+    start: moment().toDate(),
+    end: moment().add(2, "hours").toDate(),
+    bgcolor: "#fafafa",
+  },
+  {
+    Id_temporada: 21,
+    Id_jornada: 2,
+    title: "Real Madrid vs Sevilla",
+    start: moment().add(12, "hours").toDate(),
+    end: moment().add(14, "hours").toDate(),
+  }
+  ,
+];
+
 // Example of a list of events
+/*
 const events = [
   {
     title: "VARselona vs Real Madrid",
@@ -32,7 +53,7 @@ const events = [
     title: "Bayern Munich vs PSG",
     start: moment().add(12, "hours").toDate(),
     end: moment().add(14, "hours").toDate(),
-    bgcolor: "#fafafa",
+    bgcolor: "#ccc",
     notes: "Partido de UCL",
     prediccion: "/", // Prediccion no realizada
     user: {
@@ -40,8 +61,8 @@ const events = [
       name: "Cecilia",
     },
   },
-];
-
+];*/
+console.log(events);
 export const CalendarScreen = () => {
   const { user } = useContext(AuthContext);
   console.log(user.membresia);
@@ -75,7 +96,7 @@ export const CalendarScreen = () => {
 
   const eventStyleGetter = (event, start, end, isSelected) => {
     const style = {
-      backgroundColor: "#40CE6F", // PErsonalizar colores
+      backgroundColor: "#40CE6F", // Personalizar colores
       borderRAdius: "0px",
       opacity: 0.8,
       display: "block",
@@ -92,7 +113,7 @@ export const CalendarScreen = () => {
       {tieneMembresia ? (
         <div className="calendar-screen">
           <h3 className="mt-2">Temporada: 2021-Q21 </h3>
-          
+
           <Calendar
             localizer={localizer}
             events={events}
@@ -108,7 +129,6 @@ export const CalendarScreen = () => {
               event: CalendarEvent,
             }}
           />
-          {/*<CalendarModal />*/}
 
           <AgregarEvento />
         </div>

@@ -89,6 +89,29 @@ type Jornada struct {
 	Estado       string `json:"Estado"`
 }
 
+// Evento (Para metodo POST)
+type Evento struct {
+	Id_temporada     int    `json:"Id_temporada"`
+	Id_jornada       int    `json:"Id_jornada"`
+	Titulo_evento    string `json:"Titulo_evento"`
+	Equipo_local     string `json:"Equipo_local"`
+	Equipo_visitante string `json:"Equipo_visitante"`
+	Fecha_inicio     string `json:"Fecha_inicio"`
+	Fecha_final      string `json:"Fecha_final"`
+}
+
+// Evento (Para peticion GET, para que sea compatible con el calendario)
+type EventoCalendario struct {
+	Id_temporada     int    `json:"Id_temporada"`
+	Id_jornada       int    `json:"Id_jornada"`
+	Titulo_evento    string `json:"title"`
+	Equipo_local     string `json:"Equipo_local"`
+	Equipo_visitante string `json:"Equipo_visitante"`
+	Fecha_inicio     string `json:"start"`
+	Fecha_final      string `json:"end"`
+}
+
+// esto es de pruebas
 type allTasks []task
 
 // Arreglo de tareas [PRUEBAS]
@@ -524,6 +547,31 @@ func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// -------------- CREAR EVENTO --------------
+func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
+
+	var nuevoEvento Evento
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	//queryInsert := "INSERT INTO EVENTO(ID_JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO) VALUES ("+nuevoEvento.Id_jornada+","+nuevoEvento.Id_temporada+","+nuevoEvento.Titulo_evento+","+nuevoEvento.Equipo_local+","+nuevoEvento.Equipo_visitante+","+nuevoEvento.Fecha_inicio+
+
+	// Aqui me quede
+	queryInsert := `INSERT INTO EVENTO(ID_JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO)
+					VALUES(` + strconv.Itoa(nuevoEvento.Id_jornada) + `, ` + strconv.Itoa(nuevoEvento.Id_temporada) + `, '` + nuevoEvento.Titulo_evento +
+		`', '` + nuevoEvento.Equipo_local + `', '` + nuevoEvento.Equipo_visitante + `', TO_DATE ('` + nuevoEvento.Fecha_inicio + `', 'dd/mm/yyyy')` +
+		`TO_DATE('` + nuevoEvento.Fecha_final + `', 'dd/mm/yy')`
+
+	fmt.Println(queryInsert)
+
+	json.Unmarshal(reqBody, &nuevoEvento)
+}
+
 // ---------------- esto no funciona
 
 func setupCorsResponse(w *http.ResponseWriter, req *http.Request) {
@@ -603,6 +651,7 @@ func main() {
 	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")     // Crear deporte
 	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST") // Crear temporada
 	router.HandleFunc("/crearJornada", crearJornadaRouter).Methods("POST")     // Crear jornada
+	router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")       // Crear jornada
 
 	// Peticiones DELETE (aun no funciona)
 	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")

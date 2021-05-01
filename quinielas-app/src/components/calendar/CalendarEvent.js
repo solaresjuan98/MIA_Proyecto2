@@ -1,8 +1,8 @@
 import React from "react";
 
 export const CalendarEvent = ({ event }) => {
-  const { title, user, prediccion } = event;
-
+  const { title, Id_temporada } = event;
+  //console.log(event);
   return (
     <div>
       <span>{title}</span>
@@ -10,7 +10,7 @@ export const CalendarEvent = ({ event }) => {
         {" \n "} {user.name} {" \n "}
       </strong>*/}
       <br></br>
-      <span>{prediccion}</span>
+      <span>{Id_temporada} </span>
     </div>
   );
 };

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
 import Modal from "react-modal";
 import DateTimePicker from "react-datetime-picker";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 // MODAL STYLES
 const customStyles = {
@@ -21,55 +22,78 @@ Modal.setAppElement("#root");
 // Fecha de inicio
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 // Fecha de finalizacion
-const fechaFinal = ahora.clone().add(1, "hours"); // 1 hora despues del inicio
+const fechaFinal = ahora.clone().add(1.5, "hours"); // 1 hora despues del inicio
 
 export const CalendarModal = () => {
   // Url de API
   const url = "http://localhost:4000/";
-  const [tituloEvento, setTituloEvento] = useState("");
+  //const [tituloEvento, setTituloEvento] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [dateStart, setdateStart] = useState(ahora.toDate());
   const [dateEnd, setDateEnd] = useState(fechaFinal.toDate());
-  const [tituloValido, setTituloValido] = useState(true);
+  const [campoValido, setCampoValido] = useState(true);
 
+  // Estado jornadas
+  const [jornadas, setJornadas] = useState([]);
+  // Estado temporadas
+  const [temporadas, setTemporadas] = useState([]);
+  // id temporada
+  const [idTemporada, setIdTemporada] = useState(temporadas);
+  // id jornada
+  const [idJornada, setIdJornada] = useState(jornadas);
   // equipo (o jugador) local
   const [equipoLocal, setEquipoLocal] = useState("");
   // equipo (o jugador) visitante
   const [equipoVisitante, setEquipoVisitante] = useState("");
+  // filtrar jornadas
+  const [jornadasFiltradas, setJornadasFiltradas] = useState([]);
+
+  useEffect(() => {
+    obtenerListaJornadas();
+    obtenerListaTemporadas();
+  }, []);
 
   const [formValues, setFormValues] = useState({
-    Id_temporada: 43,
-    Id_jornada: 43,
+    Id_temporada: 0,
+    Id_jornada: 0,
     Titulo_evento: "",
     Equipo_local: "",
     Equipo_visitante: "",
-    Fecha_inicio: ahora.toDate(),
-    Fecha_final: fechaFinal.toDate(),
+    Fecha_inicio: moment(ahora.toDate()).format("L"),
+    Fecha_final: moment(fechaFinal.toDate()).format("L"),
   });
-
-  const { title } = formValues;
-
-  /* 
-  const handleInputChange = ({ target }) => {
-    setFormValues({
-      ...formValues,
-      [target.name]: target.value,
-    });
-  };
-
-  */
 
   const closeModal = () => {
     setModalIsOpen(false);
   };
 
+  const handleIdTemporadaChange = (e) => {
+    setIdTemporada(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Id_temporada: parseInt(e.target.value),
+    });
+
+    filtarJornadas(e.target.value);
+    //console.log(e.target.values)
+  };
+
+  const handleIdJornadaChange = (e) => {
+    setIdJornada(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Id_jornada: parseInt(e.target.value),
+    });
+  };
+
   const handleStartDateChange = (e) => {
-    console.log(e);
     setdateStart(e);
 
     setFormValues({
       ...formValues,
-      Fecha_inicio: e,
+      Fecha_inicio: moment(e).format("L"),
     });
   };
 
@@ -78,7 +102,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_final: e.target.value,
+      Fecha_final: moment(e).format("L"),
     });
   };
 
@@ -97,11 +121,13 @@ export const CalendarModal = () => {
     setFormValues({
       ...formValues,
       Equipo_visitante: e.target.value,
+      Titulo_evento:
+        formValues.Equipo_local + " vs " + formValues.Equipo_visitante,
     });
   };
 
   // Formsubmit
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
     // form values
     //console.log(formValues);
@@ -109,13 +135,6 @@ export const CalendarModal = () => {
     const fin = moment(fechaFinal);
 
     const { Equipo_local, Equipo_visitante } = formValues;
-
-    // aqui me quede
-    setTituloEvento(Equipo_local + " vs " + Equipo_visitante);
-    setFormValues({
-      ...formValues,
-      Titulo_evento: Equipo_local + " vs " + Equipo_visitante,
-    });
 
     if (inicio.isSameOrAfter(fin)) {
       return Swal.fire(
@@ -125,14 +144,62 @@ export const CalendarModal = () => {
       );
     }
 
-    if (Equipo_local.trim().length < 2) {
-      //return setTituloValido(false);
+    if (Equipo_local.trim().length < 2 || Equipo_visitante.trim().length < 2) {
+      return setCampoValido(false);
     }
     console.log(formValues);
+    // ejetuar envio de datos el backend
+    await axios
+      .post(`${url}crearEvento`, formValues)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.error(err));
 
-    setTituloValido(true);
+    setCampoValido(true);
     closeModal();
+    Swal.fire("Aviso", "Evento creado con exito", "success");
   };
+
+  //console.log(formValues.Id_temporada);
+
+  // ----------- PETICIONES GET -----------
+
+  // Obtener temporadas
+  const obtenerListaTemporadas = async () => {
+    await axios
+      .get(`${url}temporadas`)
+      .then((response) => {
+        const listaTemporadas = response.data;
+        setTemporadas(listaTemporadas);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+  };
+
+  // Obtener jornadas
+  const obtenerListaJornadas = async () => {
+    await axios
+      .get(`${url}jornadas`)
+      .then((response) => {
+        const listaJornadas = response.data;
+        setJornadas(listaJornadas);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+  };
+
+  const filtarJornadas = (idTemp) => {
+    const jFiltradas = jornadas.filter(
+      (jornada) => jornada.Id_temporada === parseInt(idTemp)
+    );
+
+    setJornadasFiltradas(jFiltradas);
+  };
+
+  /*
+  
+  const jornadasFiltradas = jornadas.filter(
+    (jornada) => jornada.Id_temporada === 21
+  );*/
 
   return (
     <Modal
@@ -149,24 +216,28 @@ export const CalendarModal = () => {
       <hr />
       <form className="container" onSubmit={handleSubmitForm}>
         <div className="form-group">
-          <label>Temporada</label>
-          <input
-            className="form-control"
-            type="text"
-            //placeholder="Readonly input here..."
-            readonly={true}
-            value={43}
-          />
+          <select
+            className="custom-select"
+            onChange={handleIdTemporadaChange}
+            value={idTemporada}
+          >
+            <option selected="">Selecciona una temporada...</option>
+            {temporadas.map((temporadas, i) => {
+              return <option>{temporadas.Id_temporada}</option>;
+            })}
+          </select>
         </div>
 
         <div className="form-group">
           <select
             className="custom-select"
-
-            //onChange={handleDeporteChange}
-            //value={deporte}
+            onChange={handleIdJornadaChange}
+            value={idJornada}
           >
             <option selected="">Selecciona una jornada...</option>
+            {jornadasFiltradas.map((jornada) => {
+              return <option>{jornada.Id_jornada}</option>;
+            })}
           </select>
         </div>
         <div className="form-group">
@@ -192,7 +263,7 @@ export const CalendarModal = () => {
           <label>Equipo / Jugador local</label>
           <input
             type="text"
-            className={`form-control ${!tituloValido && "is-invalid"}`}
+            className={`form-control ${!campoValido && "is-invalid"}`}
             placeholder="Equipo o jugador local"
             //name="title"
             autoComplete="off"
@@ -207,7 +278,7 @@ export const CalendarModal = () => {
           <label>Equipo / Jugador visitante</label>
           <input
             type="text"
-            className={`form-control ${!tituloValido && "is-invalid"}`}
+            className={`form-control ${!campoValido && "is-invalid"}`}
             placeholder="Equipo o jugador visitante"
             name="title"
             autoComplete="off"
