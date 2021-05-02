@@ -23,6 +23,7 @@ export const InternalRoutes = () => {
 
   // Valida el rol del usuario, es decir si es usuario (con o sin membresia) o administrador
   if (user.rol === "user") {
+    //console.log('xdddd');
     isUser = true;
   }
 

@@ -124,8 +124,8 @@ export const DeportesScreen = () => {
             </div>
             <div className="card-body">
               <form onSubmit={handleSubmit}>
-                <div class="form-group">
-                  <label class="col-form-label" for="inputDefault">
+                <div className="form-group">
+                  <label className="col-form-label" for="inputDefault">
                     Nombre del deporte
                   </label>
                   <input
@@ -139,7 +139,7 @@ export const DeportesScreen = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label class="col-form-label" for="inputDefault">
+                  <label className="col-form-label" for="inputDefault">
                     Color de deporte:
                   </label>
                   <br />
@@ -151,7 +151,7 @@ export const DeportesScreen = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label class="col-form-label" for="inputDefault">
+                  <label className="col-form-label" for="inputDefault">
                     Imagen de deporte:
                   </label>
                   <div className="input-group mb-3">
@@ -178,7 +178,7 @@ export const DeportesScreen = () => {
                 </div>
 
                 <div className="form-group">
-                  <button type="submit" class="btn btn-primary btn-block">
+                  <button type="submit" className="btn btn-primary btn-block">
                     Crear deporte
                   </button>
                 </div>

@@ -451,6 +451,23 @@ func obtenerEventos(n int) []EventoCalendario {
 
 }
 
+// ----------- OBTENER USUARIO -----------
+// aqui me quede en backend
+/*func obtenerUsuarioRouter(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func obtenerUsuario(n int) []Usuario {{
+
+	usuario := make([]Usuario, 0)
+
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query("SELECT NOMBRE, APELLIDO, NOMBRE_USUARIO, ID_TIER, FECHA_NACIMIENTO, CORREO_ELECTRONICO, FOTO_PERFIL FROM CLIENTES WHERE NOMBRE_USUARIO = '"+usuario+"'")
+
+}}
+*/
+
 // ------------------------------------- PETICIONES POST ---------------------------------------------------
 
 // -------------- CREAR TEMPORADA --------------
@@ -626,6 +643,29 @@ func setupCorsResponse(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Authorization")
 }
 
+// ------------------------------------- PROCEDIMIENTOS ALMACENADOS ---------------------------------------------------
+
+func iniciarSesion(w http.ResponseWriter, r *http.Request) {
+
+	var usuario Usuario
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &usuario)
+
+	res, err := db.Exec("begin INICIO_SESION(:1,:2);end;", usuario.Nickname, usuario.Contrasenia)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(res)
+}
+
 // ------------------------------------- PETICIONES DELETE ---------------------------------------------------
 
 // -------------- ELIMINAR DEPORTE --------------
@@ -698,6 +738,9 @@ func main() {
 	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST") // Crear temporada
 	router.HandleFunc("/crearJornada", crearJornadaRouter).Methods("POST")     // Crear jornada
 	router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")       // Crear jornada
+
+	// PROCEDIMIENTOS ALMACENADOS
+	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST") // inicio sesión
 
 	// Peticiones DELETE (aun no funciona)
 	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")

@@ -107,6 +107,8 @@ export const Login = ({ history }) => {
 
     if (Nickname_login === "Administrador" && Contrasenia_login === "admin") {
       rolUsuario = "administrador";
+    } else {
+      rolUsuario = "user";
     }
 
     dispatch({
@@ -118,6 +120,17 @@ export const Login = ({ history }) => {
         membresia: "Silver",
       },
     });
+
+    console.log(loginFormValues);
+
+    // Ejecutar procedimiento almacenado
+    axios
+      .post(`${url}iniciarSesion`, loginFormValues)
+      .then((response) => {
+        console.log(response);
+        //console.log(response.statusText);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
 
     if (rolUsuario === "administrador") {
       history.replace("/adminHome");
@@ -241,10 +254,11 @@ export const Login = ({ history }) => {
       <br />
       <br />
       <div className="row">
+        {/* ---------- FORMULARIO DE LOGIN ---------- */}
         <div className="col-md-6 login-form-1">
           <h3>Iniciar Sesión</h3>
           <br /> <br />
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="form-group">
               <input
                 type="text"
@@ -274,7 +288,7 @@ export const Login = ({ history }) => {
               <button
                 className="btn btn-primary btn-block mt-3"
                 type="submit"
-                onClick={handleLogin}
+                //onClick={handleLogin}
               >
                 Ingresar
               </button>

@@ -5,19 +5,19 @@ import "moment/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { messages } from "../../helpers/calendar-es";
 import { CalendarEvent } from "./CalendarEvent";
-//import { CalendarModal } from "./CalendarModal";
 import { AuthContext } from "../../Auth/AuthContext";
 import "../../App.css";
 import { AgregarEvento } from "../UI/AgregarEvento";
 import axios from "axios";
 
-moment.locale("en");
+moment.locale("es");
 const localizer = momentLocalizer(moment);
 let tieneMembresia = false;
 let events_ = [];
 
 // Definir las fecha actual, para dar colores al calendario
-const ahora = moment().minutes(0).seconds(0).add(1, "hours");
+//const ahora = moment().minutes(0).seconds(0).add(1, "hours");
+
 export const CalendarScreen = () => {
   const url = "http://localhost:4000/";
   const { user } = useContext(AuthContext);
@@ -34,10 +34,16 @@ export const CalendarScreen = () => {
 
   // Estado de eventos
   const [eventos, setEventos] = useState([]);
+  // Estado de temporadas, para filtrar
+  const [temporadas, setTemporadas] = useState([]);
+  // Estado de id de temporada para filtrar
+  const [idTemporada, setidTemporada] = useState(temporadas);
+  // Estado de eventos filtrados, para mostrar en el calendario
+  const [eventosFiltrados, setEventosFiltrados] = useState([]);
 
   useEffect(() => {
     obtenerListaEventos();
-
+    obtenerListaTemporadas();
     const interval = setInterval(() => {
       obtenerListaEventos();
     }, 5000);
@@ -49,14 +55,22 @@ export const CalendarScreen = () => {
 
   // Formateando las fechas del calendario
   for (let i = 0; i < events_.length; i++) {
-    events_[i].start = moment(events_[i].start).add(6, "hours").toDate();
-    events_[i].end = moment(events_[i].end).add(6, "hours").toDate();
+    events_[i].start = moment(events_[i].start).toDate();//.add(6, "hours").toDate();
+    events_[i].end = moment(events_[i].end).toDate(); //.add(6, "hours").toDate();
+    //events_[i].start = moment(events_[i].start).toDate();
+    //events_[i].end = moment(events_[i].end).toDate();
   }
 
   //console.log(events_);
 
   // alterar fecha de eventos
   //console.log(moment(events_[0].start).toDate());
+
+  const handleIdTemporadaChange = (e) => {
+    setidTemporada(e.target.value);
+
+    filtrarEventos(e.target.value);
+  };
 
   const [lastView, setLastView] = useState(
     localStorage.getItem("lastView") || "month"
@@ -89,14 +103,31 @@ export const CalendarScreen = () => {
     };
   };
 
-  // OBTENER LISTADO DE EVENTOS
+  // -------- OBTENER LISTADO DE EVENTOS --------
   const obtenerListaEventos = async () => {
     await axios.get(`${url}eventos`).then((response) => {
       const listaEventos = response.data;
       setEventos(listaEventos);
     });
   };
-  //console.log(eventos);
+
+  // -------- OBTENER LISTADO DE TEMPORADAS --------
+  const obtenerListaTemporadas = async () => {
+    await axios.get(`${url}temporadas`).then((response) => {
+      const listaTemporadas = response.data;
+      setTemporadas(listaTemporadas);
+    });
+  };
+
+  // --------  FILTRAR EVENTOS POR TEMPORADA --------
+  const filtrarEventos = (idTemp) => {
+    const evFiltrados = events_.filter(
+      (evento) => evento.Id_temporada === parseInt(idTemp)
+    );
+
+    setEventosFiltrados(evFiltrados);
+    console.log(evFiltrados);
+  };
 
   return (
     <div>
@@ -104,15 +135,19 @@ export const CalendarScreen = () => {
         <div>
           <form>
             <div className="form-group ml-3">
-              <label class="col-form-label" for="inputDefault">
+              <label className="col-form-label" for="inputDefault">
                 Ver eventos de temporada...
               </label>
-              <select className="custom-select">
+              <select
+                className="custom-select"
+                onChange={handleIdTemporadaChange}
+                value={idTemporada}
+              >
                 <option>Selecciona una temporada</option>
+                {temporadas.map((temporadas, i) => {
+                  return <option>{temporadas.Id_temporada}</option>;
+                })}
               </select>
-            </div>
-            <div className="form-group ml-3">
-              <button className="btn btn-success">Filtrar</button>
             </div>
           </form>
           <div className="calendar-screen">
@@ -120,7 +155,7 @@ export const CalendarScreen = () => {
 
             <Calendar
               localizer={localizer}
-              events={events_}
+              events={eventosFiltrados}
               startAccessor="start"
               endAccessor="end"
               messages={messages}
