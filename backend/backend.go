@@ -129,6 +129,12 @@ type EventoCalendario struct {
 	Fecha_final      string `json:"end"`
 }
 
+// Transaccion
+type PagoTransaccion struct {
+	Id_cliente     int    `json:"Id_cliente"`
+	Tipo_membresia string `json:"Tipo_membresia"`
+}
+
 // ----------- PETICIONES DE PRUEBA -----------
 
 func getTasks(w http.ResponseWriter, r *http.Request) {
@@ -734,6 +740,7 @@ func setupCorsResponse(w *http.ResponseWriter, req *http.Request) {
 
 // ------------------------------------- PROCEDIMIENTOS ALMACENADOS ---------------------------------------------------
 
+// -------------- INCIAR SESION --------------
 func iniciarSesion(w http.ResponseWriter, r *http.Request) {
 
 	var usuario Usuario
@@ -753,6 +760,34 @@ func iniciarSesion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(res)
+}
+
+// -------------- PAGAR MEMBRESIA --------------
+func pagarMembresia(w http.ResponseWriter, r *http.Request) {
+
+	var transaccion PagoTransaccion
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &transaccion)
+
+	fmt.Println(transaccion.Id_cliente)
+	fmt.Println(transaccion.Tipo_membresia)
+	res, err := db.Exec("begin PAGAR_MEMBRESIA(:1, :2);end;", transaccion.Id_cliente, transaccion.Tipo_membresia)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(res)
+
 }
 
 // ------------------------------------- PETICIONES DELETE ---------------------------------------------------
@@ -815,14 +850,14 @@ func main() {
 
 	// Peticiones GET
 	router.HandleFunc("/prueba", getPeopleRouter).Methods("GET")
-	router.HandleFunc("/cliente/{nickname}", obtenerUsuarioNicknameRouter).Methods("GET")
-	router.HandleFunc("/clientes/{id}", obtenerUsuarioRouter).Methods("GET") // Obtener cliente
-	router.HandleFunc("/clientes", obtenerUsuariosRouter).Methods("GET")     // Obtener clientes
-	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")             // Obtener tipos de membresia
-	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")         // Obtener deportes
-	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET") // Obtener temporadas
-	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")     // Obtener jornadas
-	router.HandleFunc("/eventos", obtenerEventosRouter).Methods("GET")       // Obtener eventos
+	router.HandleFunc("/cliente/{nickname}", obtenerUsuarioNicknameRouter).Methods("GET") // Obtener cliente por nickname
+	router.HandleFunc("/clientes/{id}", obtenerUsuarioRouter).Methods("GET")              // Obtener cliente
+	router.HandleFunc("/clientes", obtenerUsuariosRouter).Methods("GET")                  // Obtener clientes
+	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")                          // Obtener tipos de membresia
+	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")                      // Obtener deportes
+	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET")              // Obtener temporadas
+	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")                  // Obtener jornadas
+	router.HandleFunc("/eventos", obtenerEventosRouter).Methods("GET")                    // Obtener eventos
 
 	// Peticiones POST
 	router.HandleFunc("/registroCliente", crearClienteRouter).Methods("POST")  // Registrarse en el sistema
@@ -832,7 +867,8 @@ func main() {
 	router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")       // Crear jornada
 
 	// PROCEDIMIENTOS ALMACENADOS
-	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST") // inicio sesión
+	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST")   // Inicio sesión
+	router.HandleFunc("/pagarMembresia", pagarMembresia).Methods("POST") // Pagar o cambiar membresia
 
 	// Peticiones DELETE (aun no funciona)
 	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")
