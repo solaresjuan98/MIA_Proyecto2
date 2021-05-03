@@ -232,7 +232,6 @@ export const Login = ({ history }) => {
     axios.post(cloudinaryUrl, formData).then((response) => {
       setImageUrl(response.data.secure_url);
       console.log(response.data.secure_url);
-      //setImageUrl(response.data.secure_url);
       setFormValues({
         ...formValues,
         Foto_perfil: response.data.secure_url,
@@ -409,7 +408,6 @@ export const Login = ({ history }) => {
                 type="submit"
                 className="btn btn-success btn-block mt-3"
                 value="Crear cuenta"
-                //onClick={}
               />
             </div>
           </form>

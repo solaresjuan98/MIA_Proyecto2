@@ -17,26 +17,44 @@ export const PerfilScreen = () => {
   const [apellidoUsuario, setApellidoUsuario] = useState("");
   const [nicknameUsuario, setNicknameUsuario] = useState("");
   const [correoUsuario, setCorreoUsuario] = useState("");
-  const [fotoPerfilUsuario, setFotoPerfilUsuario] = useState("");
+  const [imagenSeleccionada, setImagenSeleccionada] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [contraseniaUsuario, setContraseniaUsuario] = useState("");
 
   useEffect(() => {
     obtenerDatosCliente();
   }, []);
 
-  console.log(clienteLogueado);
+  // ESTADO DE DATOS DE FOMULARIO
+  const [formValues, setFormValues] = useState(clienteLogueado);
+  //console.log(clienteLogueado);
 
   // CAMBIAR EL ESTADO DE LOS DATOS DEL FORMULARIO
   const handleNombreChange = (e) => {
     setNombreUsuario(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Nombre_usuario: e.target.value,
+    });
   };
 
   const handleApellidoChange = (e) => {
     setApellidoUsuario(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Apellido_usuario: e.target.value,
+    });
   };
 
   const handleNicknameChange = (e) => {
     setNicknameUsuario(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Nickname: e.target.value,
+    });
   };
 
   const handleCorreoChange = (e) => {
@@ -45,6 +63,31 @@ export const PerfilScreen = () => {
 
   const handleContraseniaChange = (e) => {
     setContraseniaUsuario(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Contrasenia: e.target.value,
+    });
+  };
+
+  // SUBIR IMAGEN EN CLOUDINARY
+  const subirImagen = () => {
+    console.log(imagenSeleccionada);
+    const formData = new FormData();
+    formData.append("file", imagenSeleccionada);
+    formData.append("upload_preset", "mia-proyecto2");
+
+    const cloudinaryUrl =
+      "https://api.cloudinary.com/v1_1/dxdkgv30q/image/upload";
+
+    axios.post(cloudinaryUrl, formData).then((response) => {
+      setImageUrl(response.data.secure_url);
+      console.log(response.data.secure_url);
+      /*setFormValues({
+        ...formValues,
+        Foto_perfil: response.data.secure_url,
+      });*/
+    });
   };
 
   // OBTENER DATOS DE USUARIO AUTENTICADO
@@ -74,7 +117,9 @@ export const PerfilScreen = () => {
   };
 
   // ------ FUNCION PARA ACTUALIZAR DATOS DE USUARIO ------
-  const handleUpdateUser = () => {
+  const handleUpdateUser = (e) => {
+    e.preventDefault();
+    console.log(formValues);
     Swal.fire("Aviso", "Usuario actualizado con exito", "success");
   };
 
@@ -108,11 +153,11 @@ export const PerfilScreen = () => {
             </ul>
           </div>
         </div>
-        {/* ------ FORMULARIO DE PARA EDITAR DATOS ------ */}
+        {/* ------ FORMULARIO DE PARA EDITAR (actualizar) DATOS ------ */}
         <div className="col-sm mb-5">
           <div className="card border-dark mb-3">
             <div className="card-header">
-              <h3 className="card-title">Primary card title</h3>
+              <h3 className="card-title">Editar datos de perfil</h3>
             </div>
             <div className="card-body">
               <form onSubmit={handleUpdateUser}>
@@ -188,9 +233,9 @@ export const PerfilScreen = () => {
                       <input
                         type="file"
                         className="custom-file-input"
-                        /*onChange={(event) => {
-                      setImagenSeleccionada(event.target.files[0]);
-                    }}*/
+                        onChange={(event) => {
+                          setImagenSeleccionada(event.target.files[0]);
+                        }}
                       />
                       <label className="custom-file-label">Choose file</label>
                     </div>
@@ -198,7 +243,7 @@ export const PerfilScreen = () => {
                       <span
                         style={{ cursor: "pointer" }}
                         className="input-group-text"
-                        //onClick={() => subirImagen()}
+                        onClick={() => subirImagen()}
                       >
                         Upload
                       </span>
