@@ -34,6 +34,9 @@ type People struct {
 // esto es de pruebas
 type allTasks []task
 
+// arreglo de clientes
+type clientes []Usuario
+
 // Arreglo de tareas [PRUEBAS]
 var tasks = allTasks{
 	{
@@ -48,13 +51,16 @@ var tasks = allTasks{
 // DB STRUCTS
 // Usuario
 type Usuario struct {
+	Id_cliente         int    `json:"Id_cliente"`
 	Nombre_usuario     string `json:"Nombre_usuario"`
 	Apellido_usuario   string `json:"Apellido_usuario"`
 	Nickname           string `json:"Nickname"`
-	Correo_electronico string `json:"Correo_electronico"`
-	Contrasenia        string `json:"Contrasenia"`
+	Id_tier            int    `json:"Id_tier"`
+	Membresia          string `json:"Membresia"`
 	Fecha_nacimiento   string `json:"Fecha_nacimiento"`
+	Correo_electronico string `json:"Correo_electronico"`
 	Foto_perfil        string `json:"Foto_perfil"`
+	Contrasenia        string `json:"Contrasenia"`
 }
 
 // Tier
@@ -451,22 +457,105 @@ func obtenerEventos(n int) []EventoCalendario {
 
 }
 
+// ----------- OBTENER USUARIOS -----------
+
 // ----------- OBTENER USUARIO -----------
-// aqui me quede en backend
-/*func obtenerUsuarioRouter(w http.ResponseWriter, r *http.Request) {
+
+func obtenerUsuariosRouter(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	clientes := obtenerClientes(limit)
+
+	clientesJSON, _ := json.Marshal(clientes)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(clientesJSON)
 
 }
 
-func obtenerUsuario(n int) []Usuario {{
+func obtenerUsuarioNicknameRouter(w http.ResponseWriter, r *http.Request) {
 
-	usuario := make([]Usuario, 0)
+	vars := mux.Vars(r)
 
+	nickname := vars["nickname"]
+
+	/*
+		if err != nil {
+			fmt.Fprintf(w, "f")
+			return
+		}
+	*/
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	clientes := obtenerClientes(limit)
+
+	for _, cliente := range clientes {
+
+		if cliente.Nickname == nickname {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(cliente)
+		}
+
+	}
+}
+
+func obtenerUsuarioRouter(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+
+	id_cliente, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		fmt.Fprintf(w, "f")
+		return
+	}
+
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	clientes := obtenerClientes(limit)
+
+	for _, cliente := range clientes {
+
+		if cliente.Id_cliente == id_cliente {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(cliente)
+		}
+
+	}
+
+}
+
+func obtenerClientes(n int) []Usuario {
+
+	clientes := make([]Usuario, 0)
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
-	rows, _ := db.Query("SELECT NOMBRE, APELLIDO, NOMBRE_USUARIO, ID_TIER, FECHA_NACIMIENTO, CORREO_ELECTRONICO, FOTO_PERFIL FROM CLIENTES WHERE NOMBRE_USUARIO = '"+usuario+"'")
+	rows, _ := db.Query("SELECT ID_CLIENTE, NOMBRE, APELLIDO, NOMBRE_USUARIO, (select NOMBRE_TIER from TIER WHERE TIER.ID_TIER = CLIENTES.ID_TIER), TO_CHAR(FECHA_NACIMIENTO), CORREO_ELECTRONICO, FOTO_PERFIL FROM CLIENTES")
 
-}}
-*/
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	for rows.Next() {
+		u := new(Usuario)
+		rows.Scan(&u.Id_cliente, &u.Nombre_usuario, &u.Apellido_usuario, &u.Nickname, &u.Membresia, &u.Fecha_nacimiento, &u.Correo_electronico, &u.Foto_perfil)
+		clientes = append(clientes, *u)
+
+	}
+
+	return clientes
+
+}
 
 // ------------------------------------- PETICIONES POST ---------------------------------------------------
 
@@ -726,6 +815,9 @@ func main() {
 
 	// Peticiones GET
 	router.HandleFunc("/prueba", getPeopleRouter).Methods("GET")
+	router.HandleFunc("/cliente/{nickname}", obtenerUsuarioNicknameRouter).Methods("GET")
+	router.HandleFunc("/clientes/{id}", obtenerUsuarioRouter).Methods("GET") // Obtener cliente
+	router.HandleFunc("/clientes", obtenerUsuariosRouter).Methods("GET")     // Obtener clientes
 	router.HandleFunc("/tier", obtenerTierRouter).Methods("GET")             // Obtener tipos de membresia
 	router.HandleFunc("/deportes", getDeportesRouter).Methods("GET")         // Obtener deportes
 	router.HandleFunc("/temporadas", obtenerTemporadasRouter).Methods("GET") // Obtener temporadas

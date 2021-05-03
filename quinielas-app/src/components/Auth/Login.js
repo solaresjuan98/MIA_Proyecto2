@@ -111,6 +111,7 @@ export const Login = ({ history }) => {
       rolUsuario = "user";
     }
 
+    /*
     dispatch({
       type: types.login,
       payload: {
@@ -120,6 +121,15 @@ export const Login = ({ history }) => {
         membresia: "Silver",
       },
     });
+    */
+
+    /*dispatch({
+      type: types.login,
+      payload: {
+        id: 0,
+        
+      }
+    })*/
 
     console.log(loginFormValues);
 
@@ -131,6 +141,18 @@ export const Login = ({ history }) => {
         //console.log(response.statusText);
       })
       .catch((err) => console.error(`Error: ${err}`));
+
+    
+    dispatch({
+      type: types.login,
+      payload: {
+        id: 23,
+        nickname: Nickname_login,
+        rol: rolUsuario,
+        membresia: "Silver",
+      },
+    });
+    
 
     if (rolUsuario === "administrador") {
       history.replace("/adminHome");

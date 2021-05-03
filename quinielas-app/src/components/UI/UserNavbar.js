@@ -47,6 +47,11 @@ export const UserNavbar = () => {
               </NavLink>
             </li>
             <li className="nav-item">
+              <NavLink className="nav-link"  exact to="/perfilUsuario">
+                Perfil
+              </NavLink>
+            </li>
+            <li className="nav-item">
               <NavLink className="nav-link"  exact to="/calendar">
                 Calendario
               </NavLink>

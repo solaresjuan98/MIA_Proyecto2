@@ -18,6 +18,9 @@ import { DatosScreen } from "../components/Admin/DatosScreen";
 
 export const InternalRoutes = () => {
   const { user } = useContext(AuthContext);
+
+  console.log(user);
+
   console.log(user.rol);
   let isUser = false;
 
