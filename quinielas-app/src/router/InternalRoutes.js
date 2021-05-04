@@ -15,6 +15,7 @@ import { DeportesScreen } from "../components/Admin/DeportesScreen";
 import { ReportesScreen } from "../components/Admin/ReportesScreen";
 import { TemporadasScreen } from "../components/Admin/TemporadasScreen";
 import { DatosScreen } from "../components/Admin/DatosScreen";
+import { CalendarUserScreen } from "../components/userCalendar/CalendarUserScreen";
 
 export const InternalRoutes = () => {
   const { user } = useContext(AuthContext);
@@ -44,13 +45,14 @@ export const InternalRoutes = () => {
           <Route exact path="/reportes" component={ReportesScreen} />
           <Route exact path="/temporadas" component={TemporadasScreen} />
           <Route exact path="/carga" component={DatosScreen} />
+          <Route exact path="/calendar" component={CalendarScreen} />
 
           {/*RUTAS PARA USUARIO */}
           <Route exact path="/userHome" component={UserDashboard} />
-          <Route exact path="/calendar" component={CalendarScreen} />
           <Route exact path="/membresia" component={MembresiaScreen} />
           <Route exact path="/perfilUsuario" component={PerfilScreen} />
           <Route exact path="/tablaPosiciones" component={PosicionesScreen} />
+          <Route exact path="/calendarioUsuario" component={CalendarUserScreen} />
 
           {/*RUTA POR DEFECTO (inicial)*/}
           <Redirect to="/login" />

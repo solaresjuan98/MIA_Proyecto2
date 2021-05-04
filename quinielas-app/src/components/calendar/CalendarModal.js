@@ -195,11 +195,6 @@ export const CalendarModal = () => {
     setJornadasFiltradas(jFiltradas);
   };
 
-  /*
-  
-  const jornadasFiltradas = jornadas.filter(
-    (jornada) => jornada.Id_temporada === 21
-  );*/
 
   return (
     <Modal

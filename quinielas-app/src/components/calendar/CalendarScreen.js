@@ -55,7 +55,7 @@ export const CalendarScreen = () => {
 
   // Formateando las fechas del calendario
   for (let i = 0; i < events_.length; i++) {
-    events_[i].start = moment(events_[i].start).toDate();//.add(6, "hours").toDate();
+    events_[i].start = moment(events_[i].start).toDate(); //.add(6, "hours").toDate();
     events_[i].end = moment(events_[i].end).toDate(); //.add(6, "hours").toDate();
     //events_[i].start = moment(events_[i].start).toDate();
     //events_[i].end = moment(events_[i].end).toDate();

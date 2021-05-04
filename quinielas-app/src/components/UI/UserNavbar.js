@@ -5,12 +5,9 @@ import "../../index.css";
 import { types } from "../../types/types";
 
 export const UserNavbar = () => {
-  const {
-    user: { name },
-    dispatch,
-  } = useContext(AuthContext);
+  const { user, dispatch } = useContext(AuthContext);
   //console.log(rol);
-
+  console.log(user);
   const history = useHistory();
 
   const handleLogout = () => {
@@ -47,12 +44,13 @@ export const UserNavbar = () => {
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link"  exact to="/perfilUsuario">
+              <NavLink className="nav-link" exact to="/perfilUsuario">
                 Perfil
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className="nav-link"  exact to="/calendar">
+              <NavLink className="nav-link" exact to="/calendarioUsuario">
                 Calendario
               </NavLink>
             </li>
@@ -64,7 +62,9 @@ export const UserNavbar = () => {
           </ul>
           <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul className="navbar-nav ml-auto">
-              <span className="nav-item nav-link text-info">{name}</span>
+              <span className="nav-item nav-link text-info">
+                {user.nickname}
+              </span>
               <button
                 className="nav-item nav-link btn btn-danger"
                 onClick={handleLogout}
