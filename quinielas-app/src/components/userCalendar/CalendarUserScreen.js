@@ -14,7 +14,10 @@ moment.locale("es");
 const localizer = momentLocalizer(moment);
 let tieneMembresia = false;
 
+let events_ = [];
+
 // Prueba
+/*
 const events = [
   {
     title: "VARselona vs Real Madrid",
@@ -41,6 +44,7 @@ const events = [
     },
   },
 ];
+*/
 /*
   Los eventos del calendario son relativamente simples para otorgar una mayor facilidad de uso para el usuario. La
   única información relevante por cada evento a mostrar en el calendario de navegación además de su color será el
@@ -57,10 +61,22 @@ export const CalendarUserScreen = () => {
   const [clienteLogueado, setClienteLogueado] = useState("");
   // Estado de evento seleccionado
   const [eventoSeleccionado, setEventoSeleccionado] = useState("");
+  // Eventos para mostrar en calendario
+  const [eventosCalendario, setEventosCalendario] = useState([]);
 
   useEffect(() => {
     obtenerDatosCliente();
+    obtenerEventosCalendario();
   }, []);
+
+  events_ = [...eventosCalendario];
+
+  for (let i = 0; i < events_.length; i++) {
+    events_[i].start = moment(events_[i].start).toDate(); //.add(6, "hours").toDate();
+    events_[i].end = moment(events_[i].end).toDate(); //.add(6, "hours").toDate();
+    //events_[i].start = moment(events_[i].start).toDate();
+    //events_[i].end = moment(events_[i].end).toDate();
+  }
 
   if (
     clienteLogueado.Membresia === "Gold" ||
@@ -81,10 +97,21 @@ export const CalendarUserScreen = () => {
       .catch((err) => console.error(`Error: ${err}`));
   };
 
+  // --------- OBTENER EVENTOS A MOSTRAR
+  const obtenerEventosCalendario = async () => {
+    axios
+      .get(`${url}tempActual`)
+      .then((response) => {
+        const listaEventos = response.data;
+        setEventosCalendario(listaEventos);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+  };
+
   // ------------ COSAS PARA QUE EL CALENDARIO FUNCIONE
   const eventStyleGetter = (event, start, end, isSelected) => {
     const style = {
-      //backgroundColor: "#40CE6F", // Personalizar colores
+      backgroundColor: "#33B2FF", // Personalizar colores
       borderRAdius: "0px",
       opacity: 0.8,
       display: "block",
@@ -130,7 +157,7 @@ export const CalendarUserScreen = () => {
           <div className="calendar-screen mt-1">
             <Calendar
               localizer={localizer}
-              events={events} // Cambiar por los eventos del backend
+              events={events_} // Cambiar por los eventos del backend
               startAccessor="start"
               endAccessor="end"
               messages={messages}

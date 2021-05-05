@@ -6,11 +6,8 @@ import "../../index.css";
 import { types } from "../../types/types";
 
 export const AdminNavbar = () => {
-  const {
-    user: { name },
-    dispatch,
-  } = useContext(AuthContext);
-  //console.log(rol);
+  const { user, dispatch } = useContext(AuthContext);
+  console.log(user);
 
   const history = useHistory();
 
@@ -70,17 +67,18 @@ export const AdminNavbar = () => {
                 Jornadas
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/calendar">
+                Calendario
+              </NavLink>
+            </li>
 
             <li className="nav-item">
               <NavLink className="nav-link" exact to="/reportes">
                 Reportes
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" exact to="/calendar">
-                Calendario
-              </NavLink>
-            </li>
+
             <li className="nav-item">
               <NavLink className="nav-link" exact to="/resultados">
                 Resultados
@@ -89,7 +87,9 @@ export const AdminNavbar = () => {
           </ul>
           <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul className="navbar-nav ml-auto">
-              <span className="nav-item nav-link text-info">{name}</span>
+              <span className="nav-item nav-link text-info">
+                {user.nickname}
+              </span>
               <button
                 className="nav-item nav-link btn btn-danger"
                 onClick={handleLogout}

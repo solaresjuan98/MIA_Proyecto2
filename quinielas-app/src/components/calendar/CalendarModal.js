@@ -195,10 +195,9 @@ export const CalendarModal = () => {
     setJornadasFiltradas(jFiltradas);
   };
 
-
   return (
     <Modal
-      isOpen={modalIsOpen}
+      isOpen={modalIsOpen} // cambiar propiedad desde fuera
       //onAfterOpen={afterOpenModal}
       onRequestClose={closeModal}
       style={customStyles}
@@ -231,7 +230,7 @@ export const CalendarModal = () => {
           >
             <option selected="">Selecciona una jornada...</option>
             {jornadasFiltradas.map((jornada) => {
-              return <option>{jornada.Id_jornada}</option>;
+              return <option>{jornada.Num_jornada}</option>;
             })}
           </select>
         </div>

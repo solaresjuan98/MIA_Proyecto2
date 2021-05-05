@@ -138,6 +138,7 @@ export const Login = ({ history }) => {
       .post(`${url}iniciarSesion`, loginFormValues)
       .then((response) => {
         console.log(response);
+        // obtenerusuario()
         //console.log(response.statusText);
       })
       .catch((err) => console.error(`Error: ${err}`));

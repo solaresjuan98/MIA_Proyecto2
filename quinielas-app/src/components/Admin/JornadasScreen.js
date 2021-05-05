@@ -118,7 +118,7 @@ export const JornadasScreen = () => {
 
     // Peticion post en axios
     await axios
-      .post(`${url}crearJornada`, formValues)
+      .post(`${url}crearJornadaSP`, formValues)
       .then((res) => {
         console.log(res);
         console.log(res.data);

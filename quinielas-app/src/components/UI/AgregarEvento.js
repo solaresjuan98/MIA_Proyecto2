@@ -15,7 +15,11 @@ export const AgregarEvento = () => {
       <button className="btn btn-primary fab" onClick={handleMostrarModal}>
         <i className="fas fa-plus"></i>
       </button>
-      {!abrirModal ? <CalendarModal /> : <h5>{""}</h5>}
+      {!abrirModal ? (
+        <CalendarModal />
+      ) : (
+        <h5>{""}</h5>
+      )}
     </div>
   );
 };

@@ -14,7 +14,6 @@ export const ListaTemporadas = (props) => {
             <th scope="col">Id. deporte</th>
             <th scope="col">Estado</th>
             <th scope="col"> {"  "} </th>
-            <th scope="col"> {"  "} </th>
           </tr>
         </thead>
         <tbody>
@@ -31,9 +30,6 @@ export const ListaTemporadas = (props) => {
                   <td>
                     <button className="btn btn-danger">Finalizar</button>
                   </td>
-                  <td>
-                    <button className="btn btn-success">Ver calendario</button>
-                  </td>
                 </tr>
               );
             } else {
@@ -48,9 +44,7 @@ export const ListaTemporadas = (props) => {
                   <td>
                     <button className="btn btn-primary"> Iniciar </button>
                   </td>
-                  <td>
-                    
-                  </td>
+                  <td></td>
                 </tr>
               );
             }
@@ -61,11 +55,3 @@ export const ListaTemporadas = (props) => {
   );
 };
 
-/**
- <tr className="table-light">
-              <th scope="row">{temporada.Id_temporada}</th>
-              <td>{temporada.Id_deporte}</td>
-              <td>{temporada.Estado}</td>
-              <td>@mdo</td>
-            </tr>
- */
