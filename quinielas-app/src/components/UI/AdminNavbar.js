@@ -7,7 +7,7 @@ import { types } from "../../types/types";
 
 export const AdminNavbar = () => {
   const { user, dispatch } = useContext(AuthContext);
-  console.log(user);
+  //console.log(user);
 
   const history = useHistory();
 

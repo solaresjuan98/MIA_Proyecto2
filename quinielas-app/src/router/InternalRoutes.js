@@ -20,9 +20,8 @@ import { CalendarUserScreen } from "../components/userCalendar/CalendarUserScree
 export const InternalRoutes = () => {
   const { user } = useContext(AuthContext);
 
-  console.log(user);
-
-  console.log(user.rol);
+  //console.log(user);
+  //console.log(user.rol);
   let isUser = false;
 
   // Valida el rol del usuario, es decir si es usuario (con o sin membresia) o administrador
