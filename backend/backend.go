@@ -617,6 +617,51 @@ func obtenerClientes(n int) []Usuario {
 
 }
 
+// ------------------------------------- MOSTRAR PREDICCIONES -------------------------------------
+func obtenerPrediccionRouter(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	limit, _ := strconv.Atoi(r.FormValue("limit"))
+
+	predicciones := obtenerPredicciones(limit)
+
+	prediccionesJSON, _ := json.Marshal(predicciones)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	w.Write(prediccionesJSON)
+
+}
+
+func obtenerPredicciones(n int) []Prediccion {
+
+	predicciones := make([]Prediccion, 0)
+
+	query := `SELECT ID_TEMPORADA, NUM_JORNADA, ID_CLIENTE, ID_EVENTO
+	FROM PREDICCION
+			 INNER JOIN DETALLE_PREDICCION DP on PREDICCION.ID_PREDICCION = DP.ID_PREDICCION`
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	rows, _ := db.Query(query)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	for rows.Next() {
+		p := new(Prediccion)
+		rows.Scan(&p.Id_evento, &p.Num_jornada, &p.Id_cliente, &p.Id_evento)
+		predicciones = append(predicciones, *p)
+	}
+
+	return predicciones
+
+}
+
 // ------------------------------------- PETICIONES POST ---------------------------------------------------
 
 // -------------- CREAR TEMPORADA --------------
@@ -886,7 +931,7 @@ func ingresarPrediccion(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	json.Unmarshal(reqBody, &prediccion)
-	res, err := db.Exec("begin INGRESAR_PREDICCION(:1, :2, :3, :4);end;", prediccion.Id_temporada, prediccion.Num_jornada, prediccion.Id_evento, prediccion.Id_cliente, prediccion.Marcador_local, prediccion.Marcador_visitante)
+	res, err := db.Exec("begin INGRESAR_PREDICCION(:1, :2, :3, :4, :5, :6);end;", prediccion.Id_temporada, prediccion.Num_jornada, prediccion.Id_evento, prediccion.Id_cliente, prediccion.Marcador_local, prediccion.Marcador_visitante)
 
 	if err != nil {
 		fmt.Println(err)
@@ -966,6 +1011,7 @@ func main() {
 	router.HandleFunc("/jornadas", obtenerJornadasRouter).Methods("GET")                  // Obtener jornadas
 	router.HandleFunc("/eventos", obtenerEventosRouter).Methods("GET")                    // Obtener eventos
 	router.HandleFunc("/tempActual", obtenerEventosActualesProgresoRouter).Methods("GET") // Obtener eventos de temporada actual
+	router.HandleFunc("/predicciones", obtenerPrediccionRouter).Methods("GET")            // obtener predicciones
 
 	// Peticiones POST
 	router.HandleFunc("/registroCliente", crearClienteRouter).Methods("POST")  // Registrarse en el sistema
@@ -975,9 +1021,10 @@ func main() {
 	router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")       // Crear jornada
 
 	// PROCEDIMIENTOS ALMACENADOS
-	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST")   // Inicio sesión
-	router.HandleFunc("/pagarMembresia", pagarMembresia).Methods("POST") // Pagar o cambiar membresia
-	router.HandleFunc("/crearJornadaSP", crearJornadaSP).Methods("POST") // Crear jornada
+	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST")           // Inicio sesión
+	router.HandleFunc("/pagarMembresia", pagarMembresia).Methods("POST")         // Pagar o cambiar membresia
+	router.HandleFunc("/crearJornadaSP", crearJornadaSP).Methods("POST")         // Crear jornada
+	router.HandleFunc("/ingresarPrediccion", ingresarPrediccion).Methods("POST") // Ingresar prediccion al sistema
 
 	// Peticiones DELETE (aun no funciona)
 	router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")

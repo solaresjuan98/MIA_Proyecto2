@@ -7,6 +7,7 @@
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
+    "js-yaml": "^4.1.0",
     "moment": "^2.29.1",
     "react": "^17.0.2",
     "react-big-calendar": "^0.33.2",
@@ -20,7 +21,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "sweetalert2": "^10.16.6",
-    "web-vitals": "^1.1.1"
+    "web-vitals": "^1.1.1",
+    "yamljs": "^0.3.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 //import moment from "moment";
 import { AuthContext } from "../../Auth/AuthContext";
 import Modal from "react-modal";
@@ -18,8 +18,9 @@ const customStyles = {
 };
 
 export const ModalPrediccion = ({ evento }) => {
+  const url = "http://localhost:4000/";
   const { user } = useContext(AuthContext);
-  console.log(user);
+  //console.log(user);
   const [modalIsOpen, setModalIsOpen] = useState(true);
 
   const {
@@ -30,8 +31,19 @@ export const ModalPrediccion = ({ evento }) => {
     Id_evento,
   } = evento;
 
+  // Estado de predicicones
+  const [predicciones, setPredicciones] = useState([]);
   // Estado que maneja si la predicción ya fue hecha
-  const [yaHizoPrediccion, setYaHizoPrediccion] = useState(false);
+  //const [yaHizoPrediccion, setYaHizoPrediccion] = useState(false);
+  // Obtener usuario
+  const [usuarioLogueado, setUsuarioLogueado] = useState("");
+  const [idCliente, setIdCliente] = useState(0);
+
+  useEffect(() => {
+    obtenerUsuarioLoggeado();
+    obtenerPredicciones();
+  }, []);
+
   // Estado que maneja los marcadores
   // local
   const [marcadorLocal, setMarcadorLocal] = useState(0);
@@ -53,11 +65,25 @@ export const ModalPrediccion = ({ evento }) => {
     setModalIsOpen(false);
   };
 
+  const obtenerUsuarioLoggeado = async () => {
+    await axios
+      .get(`${url}cliente/${user.nickname}`)
+      .then((response) => {
+        const cliente = response.data;
+        console.log(response.data.Id_cliente);
+        setIdCliente(response.data.Id_cliente);
+        setUsuarioLogueado(cliente);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+  };
+
   const handleMarcadorLocalChange = (e) => {
     setMarcadorLocal(e.target.value);
-
+    //console.log(usuarioLogueado.Id_cliente);
+    setIdCliente(usuarioLogueado.Id_cliente);
     setFormValues({
       ...formValues,
+      Id_cliente: idCliente,
       Marcador_local: parseInt(e.target.value),
     });
   };
@@ -71,15 +97,55 @@ export const ModalPrediccion = ({ evento }) => {
     });
   };
 
+  const obtenerPredicciones = (e) => {
+    axios.get(`${url}predicciones`).then((response) => {
+      const predicciones = response.data;
+      setPredicciones(predicciones);
+    });
+  };
+
+
+
   // ------- ENVIAR FORMULARIO DE PREDICCION ------
   const handlePrediccionSubmit = (e) => {
     e.preventDefault();
+    let bandera = false;
     console.log(formValues);
     /*
         1. Primero validar si ya el usuario hizo la predicción
             - Si ya hizo la predicción, inpedir la prediccion
             - De lo contrario, guardar la predicción en la base de datos
     */
+
+    const { Id_cliente, Id_evento } = formValues;
+
+
+    predicciones.forEach((prediccion) => {
+      if (
+        prediccion.Id_cliente === Id_cliente &&
+        prediccion.Id_evento === Id_evento
+      ) {
+        console.log("Encontrado");
+        bandera = true;
+
+      }
+    });
+
+    if (bandera) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Ya realizaste una predicción para este evento",
+      });
+      return;
+    }
+
+    /*axios
+      .post(`${url}ingresarPrediccion`, formValues)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.error(`Error: ${err}`));*/
 
     Swal.fire("Aviso", "Predicción realizada con exito", "success");
     closeModal();
