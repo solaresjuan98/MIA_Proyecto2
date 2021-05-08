@@ -1,14 +1,15 @@
 import React from "react";
 
 export const CalendarEvent = ({ event }) => {
-  const { title, Id_temporada } = event;
+  const { title, Id_temporada, Equipo_local, Equipo_visitante } = event;
   //console.log(event);
   return (
     <div>
-      <span>{title}</span>
-      {/*<strong>
-        {" \n "} {user.name} {" \n "}
-      </strong>*/}
+      <span>
+        {Equipo_local}
+        {" vs "}
+        {Equipo_visitante}
+      </span>
       <br></br>
       <span>{Id_temporada} </span>
     </div>

@@ -113,6 +113,40 @@ export const DatosScreen = () => {
     Swal.fire("Aviso", "Temporadas almacenadas con exito", "success");
   };
 
+  const almacenarEventos = async (e) => {
+    e.preventDefault();
+
+    await axios
+      .post(`${url}guardarEventosTemp`)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+
+    Swal.fire("Aviso", "Temporadas almacenadas con exito", "success");
+  };
+
+  const handlePrediccionesSubmit = async (e) => {
+    e.preventDefault();
+
+    almacenarPrediccion();
+    Swal.fire("Aviso", "Predicciones almacenadas con exito", "success");
+    //almacenadarDetallePrediccion();
+  };
+
+  const almacenarPrediccion = async () => {
+    await axios
+      .post(`${url}guardarPredicciones`)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+
+      
+  };
+
+  const almacenadarDetallePrediccion = async () => {};
+
   return (
     <div className="container mt-5">
       <h1>Seccion de datos</h1>
@@ -191,6 +225,51 @@ export const DatosScreen = () => {
               <form>
                 <button type="submit" className="btn btn-info btn-block mt-3">
                   Cargar jornadas
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row mt-5">
+        <div className="col-sm">
+          <div className="card mb-3" style={{ maxWidth: "20rem" }}>
+            <div className="card-header">
+              <h5>Eventos</h5>{" "}
+            </div>
+            <div className="card-body">
+              <form onSubmit={almacenarEventos}>
+                <button type="submit" className="btn btn-info btn-block mt-3">
+                  Cargar eventos
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div className="col-sm">
+          <div className="card mb-3" style={{ maxWidth: "20rem" }}>
+            <div className="card-header">
+              <h5>Predicciones</h5>{" "}
+            </div>
+            <div className="card-body">
+              <form onSubmit={handlePrediccionesSubmit}>
+                <button type="submit" className="btn btn-info btn-block mt-3">
+                  Cargar predicciones
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div className="col-sm">
+          <div className="card mb-3" style={{ maxWidth: "20rem" }}>
+            <div className="card-header">
+              <h5>Resultados</h5>{" "}
+            </div>
+            <div className="card-body">
+              <form>
+                <button type="submit" className="btn btn-info btn-block mt-3">
+                  Cargar resultados
                 </button>
               </form>
             </div>

@@ -478,7 +478,7 @@ func obtenerEventos(n int) []EventoCalendario {
 
 	eventos := make([]EventoCalendario, 0)
 
-	query := "SELECT ID_TEMPORADA, NUM_JORNADA, NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO FROM EVENTO"
+	query := "SELECT ID_EVENTO,ID_TEMPORADA, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO FROM EVENTO"
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
 	rows, _ := db.Query(query)
@@ -491,7 +491,7 @@ func obtenerEventos(n int) []EventoCalendario {
 
 	for rows.Next() {
 		e := new(EventoCalendario)
-		rows.Scan(&e.Id_temporada, &e.Id_jornada, &e.Titulo_evento, &e.Equipo_local, &e.Equipo_visitante, &e.Fecha_inicio, &e.Fecha_final)
+		rows.Scan(&e.Id_evento, &e.Id_temporada, &e.Equipo_local, &e.Equipo_visitante, &e.Fecha_inicio, &e.Fecha_final)
 		eventos = append(eventos, *e)
 	}
 
@@ -830,7 +830,6 @@ func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &nuevoEvento)
 
-	// Aqui me quede
 	queryInsert := `INSERT INTO EVENTO(ID_JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO)
 					VALUES(` + strconv.Itoa(nuevoEvento.Id_jornada) + `, ` + strconv.Itoa(nuevoEvento.Id_temporada) + `, '` + nuevoEvento.Titulo_evento +
 		`', '` + nuevoEvento.Equipo_local + `', '` + nuevoEvento.Equipo_visitante + `', TO_DATE ('` + nuevoEvento.Fecha_inicio + `', 'MONTH DD, YYYY, HH:MI AM')` +
@@ -942,6 +941,67 @@ func guardarTemporadasTemp(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	fmt.Println(res.LastInsertId())
+}
+
+func guardarJornadasTemp(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func guardarEventosTemp(w http.ResponseWriter, req *http.Request) {
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	query := `INSERT INTO EVENTO (ID_TEMPORADA, JORNADA, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO)
+				SELECT DISTINCT (select distinct ID_TEMPORADA
+								from TEMPORADA
+								where NOMBRE_TEMPORADA = temporada
+								AND ID_DEPORTE = (SELECT ID_DEPORTE FROM DEPORTE WHERE NOMBRE_DEPORTE = deporte)) AS ID_TEMPORADA,
+								TABLA_TEMPORAL.jornada,
+								equipo_local,
+								equipo_visitante,
+								TO_DATE(fecha, 'dd/mm/yyyy HH24:MI:SS'),
+								TO_DATE(fecha, 'dd/mm/yyyy HH24:MI:SS') + 1.5 / 24   
+				FROM TABLA_TEMPORAL`
+
+	res, err := db.Exec(query)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	fmt.Println(res.LastInsertId())
+}
+
+func guardarPrediccionesTemp(w http.ResponseWriter, req *http.Request) {
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	query := `INSERT INTO PREDICCION (ID_CLIENTE, FECHA_PREDICCION)
+			SELECT DISTINCT (SELECT ID_CLIENTE FROM CLIENTES where CLIENTES.NOMBRE_USUARIO = username) AS ID_cliente,
+							TO_DATE(fecha, 'dd/mm/yyyy HH24:MI:SS')
+			FROM TABLA_TEMPORAL`
+
+	res, err := db.Exec(query)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	fmt.Println(res.LastInsertId())
+
 }
 
 // ---------------- esto no funciona
@@ -1157,6 +1217,8 @@ func main() {
 	router.HandleFunc("/guardarClientesTemp", guardarUsuariosTemp).Methods("POST")     // Guardar clientes desde la tabla temporal
 	router.HandleFunc("/guardarDeportesTemp", guardarDeportesTemp).Methods("POST")     // Guardar deportes desde la tabla temporal
 	router.HandleFunc("/guardarTemporadasTemp", guardarTemporadasTemp).Methods("POST") // Guardar temporadas desde la tabla temporal
+	router.HandleFunc("/guardarEventosTemp", guardarEventosTemp).Methods("POST")       // Guardar eventos desde la tabla temporal
+	router.HandleFunc("/guardarPredicciones", guardarPrediccionesTemp).Methods("POST") // Guardar predicciones desde la tabla temporal
 
 	// PROCEDIMIENTOS ALMACENADOS
 	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST")           // Inicio sesión
