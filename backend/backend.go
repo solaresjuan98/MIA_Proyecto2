@@ -132,7 +132,7 @@ type Jornada struct {
 // Evento (Para metodo POST)
 type Evento struct {
 	Id_temporada     int    `json:"Id_temporada"`
-	Id_jornada       int    `json:"Id_jornada"`
+	Id_jornada       string `json:"Id_jornada"`
 	Titulo_evento    string `json:"Titulo_evento"`
 	Equipo_local     string `json:"Equipo_local"`
 	Equipo_visitante string `json:"Equipo_visitante"`
@@ -817,7 +817,7 @@ func crearDeporteRouter(w http.ResponseWriter, r *http.Request) {
 }
 
 // -------------- CREAR EVENTO --------------
-func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
+/*func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
 
 	var nuevoEvento Evento
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -830,7 +830,7 @@ func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &nuevoEvento)
 
-	queryInsert := `INSERT INTO EVENTO(ID_JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO)
+	queryInsert := `INSERT INTO EVENTO(JORNADA, ID_TEMPORADA,NOMBRE_EVENTO, EQUIPO_LOCAL, EQUIPO_VISITANTE, FECHA_INICIO_EVENTO, FECHA_FIN_EVENTO)
 					VALUES(` + strconv.Itoa(nuevoEvento.Id_jornada) + `, ` + strconv.Itoa(nuevoEvento.Id_temporada) + `, '` + nuevoEvento.Titulo_evento +
 		`', '` + nuevoEvento.Equipo_local + `', '` + nuevoEvento.Equipo_visitante + `', TO_DATE ('` + nuevoEvento.Fecha_inicio + `', 'MONTH DD, YYYY, HH:MI AM')` +
 		`, TO_DATE('` + nuevoEvento.Fecha_final + `', 'MONTH DD, YYYY, HH:MI AM'))`
@@ -849,7 +849,7 @@ func crearEventoRouter(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(queryInsert)
 	fmt.Println(res.LastInsertId())
 
-}
+}*/
 
 // -------------- GUARDAR USUARIOS DESDE LA TABLA TEMPORAL --------------
 func guardarUsuariosTemp(w http.ResponseWriter, r *http.Request) {
@@ -985,10 +985,18 @@ func guardarPrediccionesTemp(w http.ResponseWriter, req *http.Request) {
 		log.Fatal(err)
 	}
 
-	query := `INSERT INTO PREDICCION (ID_CLIENTE, FECHA_PREDICCION)
-			SELECT DISTINCT (SELECT ID_CLIENTE FROM CLIENTES where CLIENTES.NOMBRE_USUARIO = username) AS ID_cliente,
-							TO_DATE(fecha, 'dd/mm/yyyy HH24:MI:SS')
-			FROM TABLA_TEMPORAL`
+	query := `INSERT INTO PREDICCION(ID_EVENTO, ID_CLIENTE, FECHA_PREDICCION, MARCADOR_PREDICCION_EQ_LOCAL,
+						MARCADOR_PREDICCION_EQ_VISITANTE)
+				SELECT distinct ID_EVENTO,
+				ID_CLIENTE,
+				TO_DATE(fecha, 'dd/mm/yyyy HH24:MI:SS') AS fecha_pred,
+				prediccion_local,
+				prediccion_visitante
+				FROM TABLA_TEMPORAL,
+				EVENTO,
+				CLIENTES
+				WHERE TABLA_TEMPORAL.jornada = EVENTO.JORNADA
+				AND TABLA_TEMPORAL.username = CLIENTES.NOMBRE_USUARIO`
 
 	res, err := db.Exec(query)
 
@@ -1087,6 +1095,32 @@ func crearJornadaSP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Print(res)
+}
+
+func crearEventoSP(w http.ResponseWriter, r *http.Request) {
+
+	var evento Evento
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	fmt.Println(evento.Fecha_inicio)
+	fmt.Println(evento.Fecha_final)
+	json.Unmarshal(reqBody, &evento)
+	res, err := db.Exec("begin CREAR_EVENTO(:1, :2, :3, :4, :5, :6, :7);end;", evento.Id_temporada, evento.Id_jornada, evento.Titulo_evento, evento.Equipo_local, evento.Equipo_visitante, evento.Fecha_inicio, evento.Fecha_final)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Print(res)
+
 }
 
 func ingresarPrediccion(w http.ResponseWriter, r *http.Request) {
@@ -1209,11 +1243,11 @@ func main() {
 	router.HandleFunc("/predicciones", obtenerPrediccionRouter).Methods("GET")            // obtener predicciones
 
 	// Peticiones POST
-	router.HandleFunc("/registroCliente", crearClienteRouter).Methods("POST")          // Registrarse en el sistema
-	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")             // Crear deporte
-	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST")         // Crear temporada
-	router.HandleFunc("/crearJornada", crearJornadaRouter).Methods("POST")             // Crear jornada
-	router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")               // Crear jornada
+	router.HandleFunc("/registroCliente", crearClienteRouter).Methods("POST")  // Registrarse en el sistema
+	router.HandleFunc("/crearDeporte", crearDeporteRouter).Methods("POST")     // Crear deporte
+	router.HandleFunc("/crearTemporada", crearTemporadaRouter).Methods("POST") // Crear temporada
+	router.HandleFunc("/crearJornada", crearJornadaRouter).Methods("POST")     // Crear jornada
+	//router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")               // Crear jornada
 	router.HandleFunc("/guardarClientesTemp", guardarUsuariosTemp).Methods("POST")     // Guardar clientes desde la tabla temporal
 	router.HandleFunc("/guardarDeportesTemp", guardarDeportesTemp).Methods("POST")     // Guardar deportes desde la tabla temporal
 	router.HandleFunc("/guardarTemporadasTemp", guardarTemporadasTemp).Methods("POST") // Guardar temporadas desde la tabla temporal
@@ -1224,6 +1258,7 @@ func main() {
 	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST")           // Inicio sesión
 	router.HandleFunc("/pagarMembresia", pagarMembresia).Methods("POST")         // Pagar o cambiar membresia
 	router.HandleFunc("/crearJornadaSP", crearJornadaSP).Methods("POST")         // Crear jornada
+	router.HandleFunc("/crearEventoSP", crearEventoSP).Methods("POST")           // Crear eventos
 	router.HandleFunc("/ingresarPrediccion", ingresarPrediccion).Methods("POST") // Ingresar prediccion al sistema
 	router.HandleFunc("/cargaMasiva", cargarTablaTemporal).Methods("POST")       // Hacer carga masiva
 

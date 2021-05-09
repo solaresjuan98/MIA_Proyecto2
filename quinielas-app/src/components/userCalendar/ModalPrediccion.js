@@ -140,12 +140,12 @@ export const ModalPrediccion = ({ evento }) => {
       return;
     }
 
-    /*axios
+    axios
       .post(`${url}ingresarPrediccion`, formValues)
       .then((res) => {
         console.log(res.data);
       })
-      .catch((err) => console.error(`Error: ${err}`));*/
+      .catch((err) => console.error(`Error: ${err}`));
 
     Swal.fire("Aviso", "Predicción realizada con exito", "success");
     closeModal();

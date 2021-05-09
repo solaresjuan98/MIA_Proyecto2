@@ -25,6 +25,7 @@ const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fechaFinal = ahora.clone().add(1.5, "hours"); // 1 hora despues del inicio
 
 export const CalendarModal = () => {
+
   // Url de API
   const url = "http://localhost:4000/";
   //const [tituloEvento, setTituloEvento] = useState("");
@@ -84,7 +85,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      Id_jornada: parseInt(e.target.value),
+      Id_jornada: e.target.value,
     });
   };
 
@@ -150,7 +151,7 @@ export const CalendarModal = () => {
     console.log(formValues);
     // ejetuar envio de datos el backend
     await axios
-      .post(`${url}crearEvento`, formValues)
+      .post(`${url}crearEventoSP`, formValues)
       .then((res) => {
         console.log(res.data);
       })
@@ -230,7 +231,7 @@ export const CalendarModal = () => {
           >
             <option selected="">Selecciona una jornada...</option>
             {jornadasFiltradas.map((jornada) => {
-              return <option>{jornada.Num_jornada}</option>;
+              return <option>{jornada.Nombre_jornada}</option>;
             })}
           </select>
         </div>

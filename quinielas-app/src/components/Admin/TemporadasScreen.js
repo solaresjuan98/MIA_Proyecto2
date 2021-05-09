@@ -105,17 +105,17 @@ export const TemporadasScreen = () => {
     e.preventDefault();
 
     // moment(fin).format("L")
-
+    console.log("Nombre :", moment(formValues.Fecha_inicio).format("YYYY"));
     console.log(formValues);
-
-    await axios
-      .post(`${url}crearTemporada`, formValues)
-      .then((res) => {
-        //console.log(res);
-        console.log(res);
-      })
+    /*
+      await axios
+        .post(`${url}crearTemporada`, formValues)
+        .then((res) => {
+          //console.log(res);
+          console.log(res);
+        })
       .catch((err) => console.error(err));
-
+    */
     Swal.fire("Aviso", "Temporada creada con exito", "success");
   };
 

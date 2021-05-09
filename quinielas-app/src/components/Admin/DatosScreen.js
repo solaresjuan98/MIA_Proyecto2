@@ -145,7 +145,6 @@ export const DatosScreen = () => {
       
   };
 
-  const almacenadarDetallePrediccion = async () => {};
 
   return (
     <div className="container mt-5">

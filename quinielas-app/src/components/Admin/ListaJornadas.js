@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 
 export const ListaJornadas = (props) => {
   const { jornadas } = props;
@@ -37,8 +38,8 @@ export const ListaJornadas = (props) => {
                   J{jornada.Num_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
                 </td>
                 <td>{jornada.Num_jornada}</td>
-                <td>{jornada.Fecha_inicio}</td>
-                <td>{jornada.Fecha_final}</td>
+                <td>{moment(jornada.Fecha_inicio).format("l")}</td>
+                <td>{moment(jornada.Fecha_final).format("l")}</td>
               </tr>
             );
           })}
@@ -50,23 +51,19 @@ export const ListaJornadas = (props) => {
           <tr>
             <th scope="col">Id temporada</th>
 
-            <th scope="col">Nombre jornada</th>
-            <th scope="col">No. jornada</th>
+            <th scope="col">Jornada</th>
             <th scope="col">Fecha inicio</th>
             <th scope="col">Fecha final </th>
           </tr>
         </thead>
         <tbody>
-          {jornadasTerminadas.map((jornada, i) => {
+          {jornadas.map((jornada, i) => {
             return (
               <tr className="table-light" key={i}>
                 <td>{jornada.Id_temporada}</td>
-                <td>
-                  J{jornada.Num_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
-                </td>
-                <td>{jornada.Num_jornada}</td>
-                <td>{jornada.Fecha_inicio}</td>
-                <td>{jornada.Fecha_final}</td>
+                <td>{jornada.Nombre_jornada}</td>
+                <td>{moment(jornada.Fecha_inicio).format("l")}</td>
+                <td>{moment(jornada.Fecha_final).format("l")}</td>
               </tr>
             );
           })}

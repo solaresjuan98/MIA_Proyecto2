@@ -3,6 +3,11 @@ import React from "react";
 export const ListaTemporadas = (props) => {
   const { temporadas } = props;
 
+  const handleIniciarTemporada = (tempID) => {
+    // Setear la jornada como activo
+    console.log(tempID);
+  };
+
   return (
     <div>
       <table className="table">
@@ -22,9 +27,7 @@ export const ListaTemporadas = (props) => {
               return (
                 <tr className="table-light">
                   {/*<th scope="row">{temporada.Id_temporada}</th>*/}
-                  <td>
-                    {temporada.Anio}-Q{temporada.Id_temporada}
-                  </td>
+                  <td>{temporada.Nombre_temporada}</td>
                   <td>{temporada.Deporte}</td>
                   <td>{temporada.Estado}</td>
                   <td>
@@ -36,15 +39,20 @@ export const ListaTemporadas = (props) => {
               return (
                 <tr className="table-light">
                   {/*<th scope="row">{temporada.Id_temporada}</th>*/}
-                  <td>
-                    {temporada.Nombre_temporada}
-                  </td>
+                  <td>{temporada.Nombre_temporada}</td>
                   <td>{temporada.Deporte}</td>
                   <td>{temporada.Estado}</td>
                   <td>
-                    <button className="btn btn-primary"> Iniciar </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() =>
+                        handleIniciarTemporada(temporada.Id_temporada)
+                      }
+                    >
+                      {" "}
+                      Iniciar{" "}
+                    </button>
                   </td>
-                
                 </tr>
               );
             }
@@ -54,4 +62,3 @@ export const ListaTemporadas = (props) => {
     </div>
   );
 };
-

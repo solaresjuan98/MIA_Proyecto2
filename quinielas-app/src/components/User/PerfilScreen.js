@@ -20,6 +20,7 @@ export const PerfilScreen = () => {
   const [imagenSeleccionada, setImagenSeleccionada] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [contraseniaUsuario, setContraseniaUsuario] = useState("");
+  const [campoValido, setCampoValido] = useState(true);
 
   useEffect(() => {
     obtenerDatosCliente();
@@ -83,10 +84,10 @@ export const PerfilScreen = () => {
     axios.post(cloudinaryUrl, formData).then((response) => {
       setImageUrl(response.data.secure_url);
       console.log(response.data.secure_url);
-      /*setFormValues({
+      setFormValues({
         ...formValues,
         Foto_perfil: response.data.secure_url,
-      });*/
+      });
     });
   };
 
@@ -102,6 +103,14 @@ export const PerfilScreen = () => {
         setApellidoUsuario(cliente.Apellido_usuario);
         setNicknameUsuario(cliente.Nickname);
         setCorreoUsuario(cliente.Correo_electronico);
+
+        setFormValues({
+          Id_ciente: cliente.Id_ciente,
+          Nombre_usuario: cliente.Nombre_usuario,
+          Apellido_usuario: cliente.Apellido_usuario,
+          Nickname: cliente.Nickname,
+          Correo: cliente.Correo_electronico,
+        });
       })
       .catch((err) => console.error(`Error: ${err}`));
   };
@@ -120,6 +129,13 @@ export const PerfilScreen = () => {
   const handleUpdateUser = (e) => {
     e.preventDefault();
     console.log(formValues);
+
+    const { Nombre_usuario, Apellido_usuario, Nickname, Correo } = formValues;
+
+    if (Nombre_usuario.trim().length < 2) {
+      return setCampoValido(false);
+    }
+
     Swal.fire("Aviso", "Usuario actualizado con exito", "success");
   };
 
@@ -162,15 +178,26 @@ export const PerfilScreen = () => {
             <div className="card-body">
               <form onSubmit={handleUpdateUser}>
                 <div className="form-group">
+                  <label>Identificador único de cliente </label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Readonly input here…"
+                    value={clienteLogueado.Id_cliente}
+                    readOnly
+                  />
+                </div>
+                <div className="form-group">
                   <label className="col-form-label" for="inputDefault">
                     Nombre:
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${!campoValido && "is-invalid"}`}
                     placeholder="Nombre"
-                    onChange={handleNombreChange}
+                    // aqui me quede, acualizar usuario
                     value={nombreUsuario}
+                    onChange={handleNombreChange}
                   />
                 </div>
 
@@ -210,18 +237,6 @@ export const PerfilScreen = () => {
                     placeholder="Correo electrónico"
                     onChange={handleCorreoChange}
                     value={correoUsuario}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="col-form-label" for="inputDefault">
-                    Contraseña:
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Contraseña"
-                    //onChange={handleContraseniaChange}
-                    //value={contrasenia}
                   />
                 </div>
                 <div className="form-group">

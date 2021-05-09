@@ -91,7 +91,7 @@ export const CalendarScreen = () => {
 
   const eventStyleGetter = (event, start, end, isSelected) => {
     const style = {
-      backgroundColor: "#40CE6F", // Personalizar colores
+      backgroundColor: "#3391AD", // Personalizar colores
       borderRAdius: "0px",
       opacity: 0.8,
       display: "block",
