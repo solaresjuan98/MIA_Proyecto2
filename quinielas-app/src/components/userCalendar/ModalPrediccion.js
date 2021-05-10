@@ -41,7 +41,7 @@ export const ModalPrediccion = ({ evento }) => {
 
   useEffect(() => {
     obtenerUsuarioLoggeado();
-    obtenerPredicciones();
+    //obtenerPredicciones();
   }, []);
 
   // Estado que maneja los marcadores
@@ -104,8 +104,6 @@ export const ModalPrediccion = ({ evento }) => {
     });
   };
 
-
-
   // ------- ENVIAR FORMULARIO DE PREDICCION ------
   const handlePrediccionSubmit = (e) => {
     e.preventDefault();
@@ -119,8 +117,7 @@ export const ModalPrediccion = ({ evento }) => {
 
     const { Id_cliente, Id_evento } = formValues;
 
-
-    predicciones.forEach((prediccion) => {
+    /*predicciones.forEach((prediccion) => {
       if (
         prediccion.Id_cliente === Id_cliente &&
         prediccion.Id_evento === Id_evento
@@ -129,7 +126,7 @@ export const ModalPrediccion = ({ evento }) => {
         bandera = true;
 
       }
-    });
+    });*/
 
     if (bandera) {
       Swal.fire({

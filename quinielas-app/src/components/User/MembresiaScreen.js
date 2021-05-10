@@ -18,6 +18,8 @@ export const MembresiaScreen = () => {
     obtenerDatosCliente();
   }, []);
 
+ console.log(clienteLogueado);
+
   // -------- OBTENER DATOS DE USUARIO AUTENTICADO --------
   const obtenerDatosCliente = async () => {
     axios
@@ -35,9 +37,10 @@ export const MembresiaScreen = () => {
 
     const transaccion = {
       Id_cliente: clienteLogueado.Id_cliente,
-      Tipo_membresia: "Gold",
+      Tipo_membresia: "gold",
     };
 
+    console.log(transaccion);
     ejecutarSPPago(transaccion);
 
     Swal.fire("Aviso", "Membresía pagada con exito", "success");
@@ -48,7 +51,7 @@ export const MembresiaScreen = () => {
 
     const transaccion = {
       Id_cliente: clienteLogueado.Id_cliente,
-      Tipo_membresia: "Silver",
+      Tipo_membresia: "silver",
     };
 
     ejecutarSPPago(transaccion);
@@ -61,7 +64,7 @@ export const MembresiaScreen = () => {
 
     const transaccion = {
       Id_cliente: clienteLogueado.Id_cliente,
-      Tipo_membresia: "Bronze",
+      Tipo_membresia: "bronze",
     };
 
     ejecutarSPPago(transaccion);
@@ -92,14 +95,21 @@ export const MembresiaScreen = () => {
   };
 
   const badgeMembresia = () => {
-    if (clienteLogueado.Membresia === "Gold") {
+    if (clienteLogueado.Membresia === "gold") {
       return (
         <h4>
           {" "}
           <span className="badge badge-warning">Gold</span>{" "}
         </h4>
       );
-    } else if (clienteLogueado.Membresia === "Silver") {
+    } else if (clienteLogueado.Membresia === "silver") {
+      return (
+        <h4>
+          {" "}
+          <span className="badge badge-secondary">Silver</span>{" "}
+        </h4>
+      );
+    } else if (clienteLogueado.Membresia === "bronze") {
       return (
         <h4>
           {" "}

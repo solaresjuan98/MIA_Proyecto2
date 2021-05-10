@@ -15,7 +15,7 @@ export const ListaJornadas = (props) => {
   );
 
   return (
-    <div>
+    <div className="animate__animated animate__fadeInRight">
       <h4>Jornadas Activas </h4>
 
       <table className="table mt-4">

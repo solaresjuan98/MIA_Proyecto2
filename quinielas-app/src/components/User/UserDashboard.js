@@ -8,7 +8,7 @@ export const UserDashboard = () => {
   const [eventosActuales, setEventosActuales] = useState([]);
 
   useEffect(() => {
-    obtenerEventosActivos();
+    //obtenerEventosActivos();
   }, []);
 
   

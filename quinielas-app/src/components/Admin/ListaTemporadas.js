@@ -37,7 +37,7 @@ export const ListaTemporadas = (props) => {
               );
             } else {
               return (
-                <tr className="table-light">
+                <tr className="table-light animate__animated animate__fadeInRight">
                   {/*<th scope="row">{temporada.Id_temporada}</th>*/}
                   <td>{temporada.Nombre_temporada}</td>
                   <td>{temporada.Deporte}</td>

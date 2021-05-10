@@ -79,9 +79,9 @@ export const CalendarUserScreen = () => {
   }
 
   if (
-    clienteLogueado.Membresia === "Gold" ||
-    clienteLogueado.Membresia === "Silver" ||
-    clienteLogueado.Membresia === "Bronze"
+    clienteLogueado.Membresia === "gold" ||
+    clienteLogueado.Membresia === "silver" ||
+    clienteLogueado.Membresia === "bronze"
   ) {
     tieneMembresia = true;
   }
@@ -154,7 +154,7 @@ export const CalendarUserScreen = () => {
       {tieneMembresia ? (
         <div>
           {/* VER CALENDARIO */}
-          <div className="calendar-screen mt-1">
+          <div className="calendar-screen mt-1 animate__animated animate__fadeInUp">
             <Calendar
               localizer={localizer}
               events={events_} // Cambiar por los eventos del backend

@@ -11,8 +11,8 @@ const fin = ahora.clone().add(1, "months");
 
 const temporadaInicial = {
   Deporte: "",
-  Fecha_inicio: moment(ahora).format("L"),
-  Fecha_fin: moment(fin).format("L"),
+  Fecha_inicio: moment(ahora.toDate()).format("LLL"),
+  Fecha_fin: moment(fin.toDate()).format("LLL"),
 };
 
 export const TemporadasScreen = () => {
@@ -85,7 +85,7 @@ export const TemporadasScreen = () => {
     //console.log(moment(e).format("L"))
     setFormValues({
       ...formValues,
-      Fecha_inicio: moment(e).format("L"),
+      Fecha_inicio: moment(e).format("LLL"),
     });
   };
 
@@ -96,7 +96,7 @@ export const TemporadasScreen = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_fin: moment(e).format("L"),
+      Fecha_fin: moment(e).format("LLL"),
     });
   };
 
@@ -105,17 +105,29 @@ export const TemporadasScreen = () => {
     e.preventDefault();
 
     // moment(fin).format("L")
-    console.log("Nombre :", moment(formValues.Fecha_inicio).format("YYYY"));
+    console.log(
+      "Nombre :",
+      moment(formValues.Fecha_inicio).format("YYYY"),
+      "-Q"
+    );
     console.log(formValues);
-    /*
-      await axios
-        .post(`${url}crearTemporada`, formValues)
-        .then((res) => {
-          //console.log(res);
-          console.log(res);
-        })
+
+    await axios
+      .post(`${url}crearTemporadaSP`, formValues)
+      .then((res) => {
+        //console.log(res);
+        console.log(res.data);
+      })
       .catch((err) => console.error(err));
-    */
+
+    /*await axios
+      .post(`${url}crearTemporada`, formValues)
+      .then((res) => {
+        //console.log(res);
+        console.log(res.data);
+      })
+      .catch((err) => console.error(err));*/
+
     Swal.fire("Aviso", "Temporada creada con exito", "success");
   };
 
@@ -127,7 +139,7 @@ export const TemporadasScreen = () => {
             <div className="card-header">
               <h5 className="card-title">Crear nueva temporada</h5>{" "}
             </div>
-            <div className="card-body">
+            <div className="card-body animate__animated animate__fadeInDown">
               <form onSubmit={handleSubmitForm}>
                 <div className="form-group">
                   <label className="col-form-label" for="inputDefault">

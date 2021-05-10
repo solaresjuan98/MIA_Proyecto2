@@ -5,6 +5,7 @@ import DateTimePicker from "react-datetime-picker";
 import Swal from "sweetalert2";
 import axios from "axios";
 
+moment.locale("en");
 // MODAL STYLES
 const customStyles = {
   content: {
@@ -25,7 +26,6 @@ const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fechaFinal = ahora.clone().add(1.5, "hours"); // 1 hora despues del inicio
 
 export const CalendarModal = () => {
-
   // Url de API
   const url = "http://localhost:4000/";
   //const [tituloEvento, setTituloEvento] = useState("");

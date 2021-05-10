@@ -20,7 +20,13 @@ export const PerfilScreen = () => {
   const [imagenSeleccionada, setImagenSeleccionada] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [contraseniaUsuario, setContraseniaUsuario] = useState("");
-  const [campoValido, setCampoValido] = useState(true);
+  const [membresia, setMembresia] = useState("");
+
+  // Validar campos
+  const [campoNombreValido, setCampoNombreValido] = useState(true);
+  const [campoApellidoValido, setCampoApellidoValido] = useState(true);
+  const [campoNicknameValido, setCampoNicknameValido] = useState(true);
+  const [campoCorreoValido, setCampoCorreoValido] = useState(true);
 
   useEffect(() => {
     obtenerDatosCliente();
@@ -60,6 +66,11 @@ export const PerfilScreen = () => {
 
   const handleCorreoChange = (e) => {
     setCorreoUsuario(e.target.value);
+
+    setFormValues({
+      ...formValues,
+      Correo_electronico: e.target.value,
+    });
   };
 
   const handleContraseniaChange = (e) => {
@@ -103,22 +114,28 @@ export const PerfilScreen = () => {
         setApellidoUsuario(cliente.Apellido_usuario);
         setNicknameUsuario(cliente.Nickname);
         setCorreoUsuario(cliente.Correo_electronico);
+        setImageUrl(cliente.Foto_perfil);
+        //setMembresia(cliente.Membresia);
+        //setImageUrl("");
 
         setFormValues({
-          Id_ciente: cliente.Id_ciente,
+          Id_cliente: parseInt(cliente.Id_cliente),
           Nombre_usuario: cliente.Nombre_usuario,
           Apellido_usuario: cliente.Apellido_usuario,
           Nickname: cliente.Nickname,
-          Correo: cliente.Correo_electronico,
+          Correo_electronico: cliente.Correo_electronico,
+          Foto_perfil: cliente.Foto_perfil,
         });
       })
       .catch((err) => console.error(`Error: ${err}`));
   };
 
   const badgeMembresia = () => {
-    if (clienteLogueado.Membresia === "Gold") {
+    if (clienteLogueado.Membresia === "gold") {
       return <span className="badge badge-warning">Gold</span>;
-    } else if (clienteLogueado.Membresia === "Silver") {
+    } else if (clienteLogueado.Membresia === "silver") {
+      return <span className="badge badge-secondary">Silver</span>;
+    } else if (clienteLogueado.Membresia === "bronze") {
       return <span className="badge badge-secondary">Silver</span>;
     } else {
       return <span className="badge badge-info">Gratis</span>;
@@ -126,15 +143,35 @@ export const PerfilScreen = () => {
   };
 
   // ------ FUNCION PARA ACTUALIZAR DATOS DE USUARIO ------
-  const handleUpdateUser = (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
     console.log(formValues);
 
     const { Nombre_usuario, Apellido_usuario, Nickname, Correo } = formValues;
 
     if (Nombre_usuario.trim().length < 2) {
-      return setCampoValido(false);
+      return setCampoNombreValido(false);
     }
+
+    if (Apellido_usuario.trim().length < 2) {
+      return setCampoApellidoValido(false);
+    }
+
+    if (Nickname.trim().length < 2) {
+      return setCampoNicknameValido(false);
+    }
+
+    /*if (Correo.trim().length < 2) {
+      return setCampoCorreoValido(false);
+    }*/
+
+    // Ejecutar poteicion
+    await axios
+      .put(`${url}modificarUsuario`, formValues)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => console.error(`Error ${err}`));
 
     Swal.fire("Aviso", "Usuario actualizado con exito", "success");
   };
@@ -142,9 +179,9 @@ export const PerfilScreen = () => {
   return (
     <div className="container mt-5">
       <div className="row">
-        <div className="col-sm-4">
+        <div className="col-sm-4 animate__animated animate__fadeInUp">
           {/*------ TARJETA CON DATOS DE USUARIO (vista previa)------*/}
-          <div className="card mb-3">
+          <div className="card mb-3 ">
             <h3 className="card-header">Datos de perfil</h3>
             <div className="card-body">
               <h5 className="card-title">Nombre completo: </h5>
@@ -170,7 +207,7 @@ export const PerfilScreen = () => {
           </div>
         </div>
         {/* ------ FORMULARIO DE PARA EDITAR (actualizar) DATOS ------ */}
-        <div className="col-sm mb-5">
+        <div className="col-sm mb-5 animate__animated animate__fadeInRight">
           <div className="card border-dark mb-3">
             <div className="card-header">
               <h3 className="card-title">Editar datos de perfil</h3>
@@ -193,9 +230,10 @@ export const PerfilScreen = () => {
                   </label>
                   <input
                     type="text"
-                    className={`form-control ${!campoValido && "is-invalid"}`}
+                    className={`form-control ${
+                      !campoNombreValido && "is-invalid"
+                    }`}
                     placeholder="Nombre"
-                    // aqui me quede, acualizar usuario
                     value={nombreUsuario}
                     onChange={handleNombreChange}
                   />
@@ -207,7 +245,9 @@ export const PerfilScreen = () => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      !campoApellidoValido && "is-invalid"
+                    }`}
                     placeholder="Apellido"
                     onChange={handleApellidoChange}
                     value={apellidoUsuario}
@@ -220,7 +260,9 @@ export const PerfilScreen = () => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      !campoNicknameValido && "is-invalid"
+                    }`}
                     placeholder="Nickname"
                     onChange={handleNicknameChange}
                     value={nicknameUsuario}

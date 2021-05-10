@@ -134,7 +134,7 @@ export const CalendarScreen = () => {
       {tieneMembresia ? (
         <div>
           <form>
-            <div className="form-group ml-3">
+            <div className="form-group ml-3 animate__animated animate__fadeIn">
               <label className="col-form-label" for="inputDefault">
                 Ver eventos de temporada...
               </label>
@@ -150,7 +150,7 @@ export const CalendarScreen = () => {
               </select>
             </div>
           </form>
-          <div className="calendar-screen">
+          <div className="calendar-screen animate__animated animate__fadeInUp">
             {/*<h3 className="mt-2">Temporada: 2021-Q21 </h3>*/}
 
             <Calendar

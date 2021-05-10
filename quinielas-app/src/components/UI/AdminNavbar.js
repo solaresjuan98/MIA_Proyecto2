@@ -74,16 +74,17 @@ export const AdminNavbar = () => {
             </li>
 
             <li className="nav-item">
+              <NavLink className="nav-link" exact to="/resultados">
+                Resultados
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
               <NavLink className="nav-link" exact to="/reportes">
                 Reportes
               </NavLink>
             </li>
 
-            <li className="nav-item">
-              <NavLink className="nav-link" exact to="/resultados">
-                Resultados
-              </NavLink>
-            </li>
           </ul>
           <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul className="navbar-nav ml-auto">

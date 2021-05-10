@@ -1,14 +1,22 @@
+import axios from "axios";
 import React from "react";
 //import axios from 'axios'
 //import Swal from 'sweetalert2'
 
 export const TarjetaDeportes = (props) => {
   const { deportes } = props;
+  const url = "http://localhost:4000/";
 
   const handleDelete = (deporteId) => {
     console.log(deporteId);
 
     // Ejecutar la peticion delete con axios
+    axios
+      .delete(`${url}eliminarDeporteSP/${deporteId}`)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
   };
 
   if (deportes.length > 0) {
@@ -18,7 +26,7 @@ export const TarjetaDeportes = (props) => {
           className="card border-dark mb-3"
           style={{ backgroundColor: deporte.Color_deporte }}
         >
-          <div className="row card-body">
+          <div className="row card-body animate__animated animate__fadeInDown">
             <div className="col-sm-6">
               <h5 className="card-title">{deporte.Nombre}</h5>
               <button

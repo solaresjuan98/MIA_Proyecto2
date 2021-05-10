@@ -277,7 +277,7 @@ export const Login = ({ history }) => {
       <br />
       <div className="row">
         {/* ---------- FORMULARIO DE LOGIN ---------- */}
-        <div className="col-md-6 login-form-1">
+        <div className="col-md-6 login-form-1 animate__animated animate__fadeInLeft">
           <h3>Iniciar Sesión</h3>
           <br /> <br />
           <form onSubmit={handleLogin}>
@@ -318,7 +318,7 @@ export const Login = ({ history }) => {
           </form>
         </div>
         {/*---------- FORMULARIO DE REGISTRO DE USUARIO ---------*/}
-        <div className="col-md-6 login-form-2">
+        <div className="col-md-6 login-form-2 animate__animated animate__fadeInRight">
           <h3>Registrarse</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-group">

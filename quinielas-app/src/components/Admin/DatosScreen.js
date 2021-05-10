@@ -126,15 +126,8 @@ export const DatosScreen = () => {
     Swal.fire("Aviso", "Temporadas almacenadas con exito", "success");
   };
 
-  const handlePrediccionesSubmit = async (e) => {
+  const almacenarPredicciones = async (e) => {
     e.preventDefault();
-
-    almacenarPrediccion();
-    Swal.fire("Aviso", "Predicciones almacenadas con exito", "success");
-    //almacenadarDetallePrediccion();
-  };
-
-  const almacenarPrediccion = async () => {
     await axios
       .post(`${url}guardarPredicciones`)
       .then((response) => {
@@ -142,16 +135,27 @@ export const DatosScreen = () => {
       })
       .catch((err) => console.error(`Error: ${err}`));
 
-      
+    Swal.fire("Aviso", "Predicciones almacenadas con exito", "success");
   };
 
+  const almacenarResultados = async (e) => {
+    e.preventDefault();
+    await axios
+      .post(`${url}guardarResultados`)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+
+    Swal.fire("Aviso", "Resultados almacenados con exito", "success");
+  };
 
   return (
     <div className="container mt-5">
       <h1>Seccion de datos</h1>
       <hr />
       <h5>Subir un archivo YAML</h5>
-      <div className="input-group mb-3">
+      <div className="input-group mb-3 animate__animated animate__fadeIn">
         <div className="custom-file">
           <input
             type="file"
@@ -171,7 +175,7 @@ export const DatosScreen = () => {
         </div>
       </div>
       <h2>Elige que datos quieres cargar a la base de datos</h2>
-      <div className="row mt-5">
+      <div className="row mt-5 animate__animated animate__fadeInUp">
         <div className="col-sm">
           <div className="card mb-3" style={{ maxWidth: "20rem" }}>
             <div className="card-header">
@@ -231,7 +235,7 @@ export const DatosScreen = () => {
         </div>
       </div>
 
-      <div className="row mt-5">
+      <div className="row mt-5 animate__animated animate__fadeInUp">
         <div className="col-sm">
           <div className="card mb-3" style={{ maxWidth: "20rem" }}>
             <div className="card-header">
@@ -252,7 +256,7 @@ export const DatosScreen = () => {
               <h5>Predicciones</h5>{" "}
             </div>
             <div className="card-body">
-              <form onSubmit={handlePrediccionesSubmit}>
+              <form onSubmit={almacenarPredicciones}>
                 <button type="submit" className="btn btn-info btn-block mt-3">
                   Cargar predicciones
                 </button>
@@ -266,7 +270,7 @@ export const DatosScreen = () => {
               <h5>Resultados</h5>{" "}
             </div>
             <div className="card-body">
-              <form>
+              <form onSubmit={almacenarResultados}>
                 <button type="submit" className="btn btn-info btn-block mt-3">
                   Cargar resultados
                 </button>

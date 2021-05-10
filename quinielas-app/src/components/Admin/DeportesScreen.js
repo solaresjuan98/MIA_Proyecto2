@@ -122,7 +122,7 @@ export const DeportesScreen = () => {
             <div className="card-header">
               <h5 className="card-title">Crear nuevo deporte</h5>{" "}
             </div>
-            <div className="card-body">
+            <div className="card-body animate__animated animate__fadeInDown">
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label className="col-form-label" for="inputDefault">
