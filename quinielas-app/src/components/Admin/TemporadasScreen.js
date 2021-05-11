@@ -5,6 +5,7 @@ import DateTimePicker from "react-datetime-picker";
 import { ListaTemporadas } from "./ListaTemporadas";
 import Swal from "sweetalert2";
 
+moment.locale("en");
 // configurar Fecha de inicio y fecha de fin por defecto de la temporada
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "months");
@@ -137,7 +138,7 @@ export const TemporadasScreen = () => {
         <div className="col-sm-4">
           <div className="card border-light mb-3">
             <div className="card-header">
-              <h5 className="card-title">Crear nueva temporada</h5>{" "}
+              <h5 className="card-title">Ingresar Temporada</h5>{" "}
             </div>
             <div className="card-body animate__animated animate__fadeInDown">
               <form onSubmit={handleSubmitForm}>

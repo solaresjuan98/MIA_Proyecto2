@@ -157,6 +157,7 @@ type EventoCalendario struct {
 type PagoTransaccion struct {
 	Id_cliente     int    `json:"Id_cliente"`
 	Tipo_membresia string `json:"Tipo_membresia"`
+	Id_temporada   int    `json:"Id_temporada"`
 }
 
 // Prediccion
@@ -169,6 +170,8 @@ type Prediccion struct {
 	Marcador_local     int    `json:"Marcador_local"`
 	Marcador_visitante int    `json:"Marcador_visitante"`
 	Fecha_prediccion   string `json:"Fecha_prediccion"`
+	Equipo_local       string `json:"Equipo_local"`
+	Equipo_visitante   string `json:"Equipo_visitante"`
 }
 
 // Resultado
@@ -678,13 +681,16 @@ func obtenerPredicciones(n int) []Prediccion {
 
 	predicciones := make([]Prediccion, 0)
 
-	query := `SELECT ID_PREDICCION,
+	query := `select ID_PREDICCION,
 				ID_CLIENTE,
-				ID_EVENTO,
+				PREDICCION.ID_EVENTO,
 				FECHA_PREDICCION,
+				EQUIPO_LOCAL,
 				MARCADOR_PREDICCION_EQ_LOCAL,
+				EQUIPO_VISITANTE,
 				MARCADOR_PREDICCION_EQ_VISITANTE
-			FROM PREDICCION`
+			from PREDICCION
+				INNER JOIN EVENTO E on E.ID_EVENTO = PREDICCION.ID_EVENTO`
 
 	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
 	rows, _ := db.Query(query)
@@ -697,8 +703,8 @@ func obtenerPredicciones(n int) []Prediccion {
 
 	for rows.Next() {
 		p := new(Prediccion)
-		rows.Scan(&p.Id_prediccion, &p.Id_cliente, &p.Id_evento, &p.Fecha_prediccion, &p.Marcador_local, &p.Marcador_visitante)
-		//rows.Scan(&p.Id_evento, &p.Num_jornada, &p.Id_cliente, &p.Id_evento)
+		rows.Scan(&p.Id_prediccion, &p.Id_cliente, &p.Id_evento, &p.Fecha_prediccion, &p.Equipo_local, &p.Marcador_local, &p.Equipo_visitante, &p.Marcador_visitante)
+
 		predicciones = append(predicciones, *p)
 	}
 
@@ -1050,17 +1056,20 @@ func guardarPrediccionesTemp(w http.ResponseWriter, req *http.Request) {
 	}
 
 	query := `INSERT INTO PREDICCION(ID_EVENTO, ID_CLIENTE, FECHA_PREDICCION, MARCADOR_PREDICCION_EQ_LOCAL,
-						MARCADOR_PREDICCION_EQ_VISITANTE)
-				SELECT distinct ID_EVENTO,
-				ID_CLIENTE,
-				TO_DATE(fecha, 'dd/mm/yyyy HH24:MI:SS') AS fecha_pred,
-				prediccion_local,
-				prediccion_visitante
-				FROM TABLA_TEMPORAL,
-				EVENTO,
-				CLIENTES
-				WHERE TABLA_TEMPORAL.jornada = EVENTO.JORNADA
-				AND TABLA_TEMPORAL.username = CLIENTES.NOMBRE_USUARIO`
+					MARCADOR_PREDICCION_EQ_VISITANTE)
+			select DISTINCT ID_EVENTO,
+			ID_CLIENTE,
+			TO_DATE(TABLA_TEMPORAL.FECHA, 'dd/mm/yyyy HH24:MI:SS') AS fecha_pred,
+			PREDICCION_LOCAL,
+			PREDICCION_VISITANTE
+			from TABLA_TEMPORAL,
+			CLIENTES,
+			EVENTO,
+			JORNADA
+			where NOMBRE_USUARIO = USERNAME
+			AND EVENTO.EQUIPO_LOCAL = TABLA_TEMPORAL.EQUIPO_LOCAL
+			AND EVENTO.EQUIPO_VISITANTE = TABLA_TEMPORAL.EQUIPO_VISITANTE
+			AND EVENTO.JORNADA = TABLA_TEMPORAL.JORNADA`
 
 	res, err := db.Exec(query)
 
@@ -1155,9 +1164,10 @@ func pagarMembresia(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &transaccion)
 
+	fmt.Println(transaccion.Id_temporada)
 	fmt.Println(transaccion.Id_cliente)
 	fmt.Println(transaccion.Tipo_membresia)
-	res, err := db.Exec("begin PAGAR_MEMBRESIA(:1, :2);end;", transaccion.Id_cliente, transaccion.Tipo_membresia)
+	res, err := db.Exec("begin PAGAR_MEMBRESIA(:1, :2, :3);end;", transaccion.Id_cliente, transaccion.Tipo_membresia, transaccion.Id_temporada)
 
 	if err != nil {
 		fmt.Println(err)
@@ -1182,6 +1192,9 @@ func crearJornadaSP(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	json.Unmarshal(reqBody, &jornada)
+
+	fmt.Println(jornada.Fecha_inicio)
+	fmt.Println(jornada.Fecha_final)
 	res, err := db.Exec("begin CREAR_JORNADA(:1, :2, :3);end;", jornada.Id_temporada, jornada.Fecha_inicio, jornada.Fecha_final)
 
 	if err != nil {
@@ -1322,6 +1335,33 @@ func crearTemporadaSP(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ingresarResultado(w http.ResponseWriter, r *http.Request) {
+
+	var resultado Resultado
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &resultado)
+
+	res, err := db.Exec("begin INGRESAR_RESULTADO(:1, :2, :3);end;", resultado.Id_evento, resultado.Marcador_local, resultado.Marcador_visitante)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//w.WriteHeader(http.MethodDelete)
+	fmt.Println(res)
+
+}
+
 // ------------------------------------- PETICIONES DELETE ---------------------------------------------------
 
 func eliminarDeporte(w http.ResponseWriter, r *http.Request) {
@@ -1437,7 +1477,6 @@ func main() {
 	router.HandleFunc("/guardarEventosTemp", guardarEventosTemp).Methods("POST")       // Guardar eventos desde la tabla temporal
 	router.HandleFunc("/guardarPredicciones", guardarPrediccionesTemp).Methods("POST") // Guardar predicciones desde la tabla temporal
 	router.HandleFunc("/guardarResultados", guardarResultadosTemp).Methods("POST")     // Guardar resultados desde la tabla temporal
-	//router.HandleFunc("/crearEvento", crearEventoRouter).Methods("POST")               // Crear jornada
 
 	// PROCEDIMIENTOS ALMACENADOS
 	router.HandleFunc("/iniciarSesion", iniciarSesion).Methods("POST")           // Inicio sesión
@@ -1447,11 +1486,12 @@ func main() {
 	router.HandleFunc("/ingresarPrediccion", ingresarPrediccion).Methods("POST") // Ingresar prediccion al sistema
 	router.HandleFunc("/cargaMasiva", cargarTablaTemporal).Methods("POST")       // Hacer carga masiva
 	router.HandleFunc("/modificarUsuario", modificarUsuario).Methods("PUT")      // Modificar cliente
-	router.HandleFunc("/crearTemporadaSP", crearTemporadaSP).Methods("POST")
+	router.HandleFunc("/crearTemporadaSP", crearTemporadaSP).Methods("POST")     // Crear temporada
+	router.HandleFunc("/ingresarResultadoSP", ingresarResultado).Methods("POST") // Ingresar resultado
 
 	// Peticiones DELETE
 	router.HandleFunc("/eliminarDeporteSP/{id_deporte}", eliminarDeporte).Methods("DELETE") // Borrar deporte
-	//router.HandleFunc("/eliminarDeporte/{Nombre}", eliminarDeporteRouter).Methods("DELETE")
+
 	// SETEAR PUERTO
 	log.Fatal(http.ListenAndServe(":4000", handlers.CORS(headers, methods, origins)(router)))
 

@@ -74,6 +74,12 @@ export const AdminNavbar = () => {
             </li>
 
             <li className="nav-item">
+              <NavLink className="nav-link" exact to="/predicciones">
+                Predicciones
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
               <NavLink className="nav-link" exact to="/resultados">
                 Resultados
               </NavLink>

@@ -278,6 +278,20 @@ export const DatosScreen = () => {
             </div>
           </div>
         </div>
+        <div className="col-sm">
+          <div className="card mb-3" style={{ maxWidth: "20rem" }}>
+            <div className="card-header">
+              <h5>Eliminar datos</h5>{" "}
+            </div>
+            <div className="card-body">
+              <form /*onSubmit={almacenarResultados}*/>
+                <button type="submit" className="btn btn-danger btn-block mt-3">
+                  ELIMINAR DATOS
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

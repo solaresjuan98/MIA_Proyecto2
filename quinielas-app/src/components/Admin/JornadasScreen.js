@@ -6,14 +6,15 @@ import { ListaJornadas } from "./ListaJornadas";
 //import { useForm } from "../hooks/useForm";
 import Swal from "sweetalert2";
 
+moment.locale('en');
 // Definir las fecha de inicio y de fin por defecto de la jornada
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "week");
 
 const jornadaInicial = {
   Id_temporada: 0,
-  Fecha_inicio: moment(ahora).format("L"),
-  Fecha_final: moment(fin).format("L"),
+  Fecha_inicio: moment(ahora).format("LLL"),
+  Fecha_final: moment(fin).format("LLL"),
 };
 
 export const JornadasScreen = () => {
@@ -74,7 +75,7 @@ export const JornadasScreen = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_inicio: moment(e).format("L"),
+      Fecha_inicio: moment(e).format("LLL"),
     });
   };
 
@@ -83,7 +84,7 @@ export const JornadasScreen = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_final: moment(e).format("L"),
+      Fecha_final: moment(e).format("LLL"),
     });
   };
 

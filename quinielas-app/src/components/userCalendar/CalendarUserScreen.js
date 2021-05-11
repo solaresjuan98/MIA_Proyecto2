@@ -16,35 +16,7 @@ let tieneMembresia = false;
 
 let events_ = [];
 
-// Prueba
-/*
-const events = [
-  {
-    title: "VARselona vs Real Madrid",
-    start: moment().toDate(),
-    end: moment().add(2, "hours").toDate(),
-    bgcolor: "#fafafa",
-    notes: "Partido de LaLiga",
-    prediccion: "0-2",
-    user: {
-      _id: "123",
-      name: "Juan",
-    },
-  },
-  {
-    title: "Bayern Munich vs PSG",
-    start: moment().add(12, "hours").toDate(),
-    end: moment().add(14, "hours").toDate(),
-    bgcolor: "#ccc",
-    notes: "Partido de UCL",
-    prediccion: "/", // Prediccion no realizada
-    user: {
-      _id: "124",
-      name: "Cecilia",
-    },
-  },
-];
-*/
+
 /*
   Los eventos del calendario son relativamente simples para otorgar una mayor facilidad de uso para el usuario. La
   única información relevante por cada evento a mostrar en el calendario de navegación además de su color será el
@@ -84,6 +56,10 @@ export const CalendarUserScreen = () => {
     clienteLogueado.Membresia === "bronze"
   ) {
     tieneMembresia = true;
+  } else if(clienteLogueado.Membresia === "gratis" || clienteLogueado.Membresia === "Gratis"){
+    tieneMembresia = false;
+  }else{
+    tieneMembresia = false;
   }
 
   // OBTENER DATOS DE USUARIO AUTENTICADO

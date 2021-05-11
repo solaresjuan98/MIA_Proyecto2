@@ -41,7 +41,7 @@ export const ModalPrediccion = ({ evento }) => {
 
   useEffect(() => {
     obtenerUsuarioLoggeado();
-    //obtenerPredicciones();
+    obtenerPredicciones();
   }, []);
 
   // Estado que maneja los marcadores
@@ -117,16 +117,14 @@ export const ModalPrediccion = ({ evento }) => {
 
     const { Id_cliente, Id_evento } = formValues;
 
-    /*predicciones.forEach((prediccion) => {
+    predicciones.forEach((predicciones) => {
       if (
-        prediccion.Id_cliente === Id_cliente &&
-        prediccion.Id_evento === Id_evento
+        predicciones.Id_cliente === Id_cliente &&
+        predicciones.Id_evento === Id_evento
       ) {
-        console.log("Encontrado");
         bandera = true;
-
       }
-    });*/
+    });
 
     if (bandera) {
       Swal.fire({
@@ -140,7 +138,7 @@ export const ModalPrediccion = ({ evento }) => {
     axios
       .post(`${url}ingresarPrediccion`, formValues)
       .then((res) => {
-        console.log(res.data);
+        console.log(res);
       })
       .catch((err) => console.error(`Error: ${err}`));
 

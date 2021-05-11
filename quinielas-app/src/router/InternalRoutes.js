@@ -16,6 +16,7 @@ import { ReportesScreen } from "../components/Admin/ReportesScreen";
 import { TemporadasScreen } from "../components/Admin/TemporadasScreen";
 import { DatosScreen } from "../components/Admin/DatosScreen";
 import { CalendarUserScreen } from "../components/userCalendar/CalendarUserScreen";
+import { PrediccionesScreen } from "../components/Admin/PrediccionesScreen";
 
 export const InternalRoutes = () => {
   const { user } = useContext(AuthContext);
@@ -45,6 +46,7 @@ export const InternalRoutes = () => {
           <Route exact path="/temporadas" component={TemporadasScreen} />
           <Route exact path="/carga" component={DatosScreen} />
           <Route exact path="/calendar" component={CalendarScreen} />
+          <Route exact path="/predicciones" component={PrediccionesScreen} />
 
           {/*RUTAS PARA USUARIO */}
           <Route exact path="/userHome" component={UserDashboard} />

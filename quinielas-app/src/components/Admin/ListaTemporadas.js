@@ -8,6 +8,10 @@ export const ListaTemporadas = (props) => {
     console.log(tempID);
   };
 
+  const handleTerminarJornada = (tempID) => {
+    console.log(tempID);
+  };
+
   return (
     <div>
       <table className="table">
@@ -25,13 +29,20 @@ export const ListaTemporadas = (props) => {
           {temporadas.map((temporada, i) => {
             if (temporada.Estado === "Activo") {
               return (
-                <tr className="table-light">
+                <tr className="table-light animate__animated animate__fadeInRight">
                   {/*<th scope="row">{temporada.Id_temporada}</th>*/}
                   <td>{temporada.Nombre_temporada}</td>
                   <td>{temporada.Deporte}</td>
                   <td>{temporada.Estado}</td>
                   <td>
-                    <button className="btn btn-danger">Finalizar</button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() =>
+                        handleTerminarJornada(temporada.Id_temporada)
+                      }
+                    >
+                      Finalizar
+                    </button>
                   </td>
                 </tr>
               );

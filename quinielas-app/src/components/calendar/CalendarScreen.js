@@ -10,7 +10,7 @@ import "../../App.css";
 import { AgregarEvento } from "../UI/AgregarEvento";
 import axios from "axios";
 
-moment.locale("es");
+moment.locale("en");
 const localizer = momentLocalizer(moment);
 let tieneMembresia = false;
 let events_ = [];
@@ -148,6 +148,10 @@ export const CalendarScreen = () => {
                   return <option>{temporadas.Id_temporada}</option>;
                 })}
               </select>
+              <h6>
+                Fin de temporada:{" "}
+                <span className="badge badge-warning">New</span>
+              </h6>
             </div>
           </form>
           <div className="calendar-screen animate__animated animate__fadeInUp">
@@ -173,7 +177,9 @@ export const CalendarScreen = () => {
           </div>
         </div>
       ) : (
-        <h1>Para acceder al calendario, debes tener una membresia activa</h1>
+        <h1 className="animate__animated animate__fadeIn">
+          Para acceder al calendario, debes tener una membresia activa
+        </h1>
       )}
     </div>
   );

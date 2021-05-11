@@ -203,7 +203,7 @@ export const CalendarModal = () => {
       onRequestClose={closeModal}
       style={customStyles}
       closeTimeoutMS={200}
-      className="modal"
+      className="modal animate__animated animate__fadeIn"
       overlayClassName="modal-fondo"
       contentLabel="Example Modal"
     >

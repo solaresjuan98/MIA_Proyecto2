@@ -23,7 +23,6 @@ export const ListaJornadas = (props) => {
           <tr>
             <th scope="col">Id temporada</th>
             <th scope="col">Nombre jornada</th>
-            <th scope="col">No. jornada</th>
 
             <th scope="col">Fecha inicio</th>
             <th scope="col">Fecha final </th>
@@ -34,10 +33,7 @@ export const ListaJornadas = (props) => {
             return (
               <tr className="table-light" key={i}>
                 <td>{jornada.Id_temporada}</td>
-                <td>
-                  J{jornada.Num_jornada}/{jornada.Anio}-Q{jornada.Id_temporada}
-                </td>
-                <td>{jornada.Num_jornada}</td>
+                <td>{jornada.Nombre_jornada}</td>
                 <td>{moment(jornada.Fecha_inicio).format("l")}</td>
                 <td>{moment(jornada.Fecha_final).format("l")}</td>
               </tr>

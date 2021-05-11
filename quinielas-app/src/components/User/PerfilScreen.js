@@ -109,6 +109,7 @@ export const PerfilScreen = () => {
       .then((response) => {
         const cliente = response.data;
         setClienteLogueado(cliente);
+        console.log(cliente)
         // Setear valores
         setNombreUsuario(cliente.Nombre_usuario);
         setApellidoUsuario(cliente.Apellido_usuario);
@@ -196,11 +197,15 @@ export const PerfilScreen = () => {
               {badgeMembresia()}
             </div>
             <ul className="list-group list-group-flush">
-              <li className="list-group-item">@{clienteLogueado.Nickname}</li>
               <li className="list-group-item">
+                <h6>Nickname </h6>@{clienteLogueado.Nickname}
+              </li>
+              <li className="list-group-item">
+                <h6>Fecha de nacimiento: </h6>
                 {moment(clienteLogueado.Fecha_nacimiento).format("LL")}
               </li>
               <li className="list-group-item">
+                <h6>Correo electronico </h6>
                 {clienteLogueado.Correo_electronico}
               </li>
             </ul>
