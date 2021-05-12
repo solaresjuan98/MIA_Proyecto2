@@ -1462,6 +1462,34 @@ func ingresarResultado(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func finalizarTemporada(w http.ResponseWriter, r *http.Request) {
+
+	var temp Temporada
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	db, err := sql.Open("oci8", "TEST/1234@localhost:1521/ORCL18")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	json.Unmarshal(reqBody, &temp)
+
+	fmt.Println(temp.Id_temporada)
+
+	res, err := db.Exec("begin FINALIZAR_TEMPORADA(:1);end;", temp.Id_temporada)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//w.WriteHeader(http.MethodDelete)
+	fmt.Println(res)
+}
+
 func finalizarJornada(w http.ResponseWriter, r *http.Request) {
 
 	var jornada Jornada
@@ -1619,6 +1647,7 @@ func main() {
 	router.HandleFunc("/crearTemporadaSP", crearTemporadaSP).Methods("POST")     // Crear temporada
 	router.HandleFunc("/ingresarResultadoSP", ingresarResultado).Methods("POST") // Ingresar resultado
 	router.HandleFunc("/finalizarJornada", finalizarJornada).Methods("POST")     // Finalizar jornadas
+	router.HandleFunc("/finalizarTemporada", finalizarTemporada).Methods("POST") // Finalizar temporadas
 
 	// Peticiones DELETE
 	router.HandleFunc("/eliminarDeporteSP/{id_deporte}", eliminarDeporte).Methods("DELETE") // Borrar deporte

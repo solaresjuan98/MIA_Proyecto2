@@ -1,15 +1,27 @@
 import React from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export const ListaTemporadas = (props) => {
   const { temporadas } = props;
 
-  const handleIniciarTemporada = (tempID) => {
-    // Setear la jornada como activo
-    console.log(tempID);
-  };
+  const url = "http://localhost:4000/";
 
-  const handleTerminarJornada = (tempID) => {
+  const handleTerminarTemporada = async (tempID) => {
     console.log(tempID);
+
+    //console.log(jornadaID);
+    const solicitud = {
+      Id_jornada: parseInt(tempID),
+    };
+
+    await axios
+      .post(`${url}finalizarTemporada`, solicitud)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => console.log(`Error: ${err}`));
+    Swal.fire("Aviso", "Temporada finalizada", "success");
   };
 
   // Filtrar jornadas activas
@@ -19,7 +31,8 @@ export const ListaTemporadas = (props) => {
 
   // Filtrar temporadas inactivas
   const temporadasInactivas = temporadas.filter(
-    (temporada) => temporada.Estado !== "Activo"
+    (temporada) =>
+      temporada.Estado !== "Activo" || temporada.Estado === "Finalizada"
   );
 
   return (
@@ -46,7 +59,7 @@ export const ListaTemporadas = (props) => {
                   <button
                     className="btn btn-danger"
                     onClick={() =>
-                      handleTerminarJornada(temporada.Id_temporada)
+                      handleTerminarTemporada(temporada.Id_temporada)
                     }
                   >
                     Finalizar
@@ -72,18 +85,9 @@ export const ListaTemporadas = (props) => {
             return (
               <tr className="table-light" key={i}>
                 <td>{temporada.Nombre_temporada}</td>
-                <td>{temporada.Deporte}</td>
+                <td>{temporada.Id_temporada}</td>
                 <td>{temporada.Estado}</td>
-                <td>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() =>
-                      handleTerminarJornada(temporada.Id_temporada)
-                    }
-                  >
-                    Finalizar
-                  </button>
-                </td>
+                <td></td>
               </tr>
             );
           })}
@@ -91,64 +95,4 @@ export const ListaTemporadas = (props) => {
       </table>
     </div>
   );
-
-  /*return (
-    <div>
-      <table className="table">
-        <thead className="thead-dark">
-          <tr>
-
-            <th scope="col">Nombre temp</th>
-            <th scope="col">Id. deporte</th>
-            <th scope="col">Estado</th>
-            <th scope="col"> {"  "} </th>
-          </tr>
-        </thead>
-        <tbody>
-          {temporadas.map((temporada, i) => {
-            if (temporada.Estado === "Activo") {
-              return (
-                <tr className="table-light animate__animated animate__fadeInRight">
-         
-                  <td>{temporada.Nombre_temporada}</td>
-                  <td>{temporada.Deporte}</td>
-                  <td>{temporada.Estado}</td>
-                  <td>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() =>
-                        handleTerminarJornada(temporada.Id_temporada)
-                      }
-                    >
-                      Finalizar
-                    </button>
-                  </td>
-                </tr>
-              );
-            } else {
-              return (
-                <tr className="table-light animate__animated animate__fadeInRight">
-                
-                  <td>{temporada.Nombre_temporada}</td>
-                  <td>{temporada.Deporte}</td>
-                  <td>{temporada.Estado}</td>
-                  <td>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() =>
-                        handleIniciarTemporada(temporada.Id_temporada)
-                      }
-                    >
-                      {" "}
-                      Iniciar{" "}
-                    </button>
-                  </td>
-                </tr>
-              );
-            }
-          })}
-        </tbody>
-      </table>
-    </div>
-  );*/
 };
