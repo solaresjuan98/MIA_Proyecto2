@@ -133,7 +133,7 @@ export const TemporadasScreen = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container-fluid mt-5">
       <div className="row">
         <div className="col-sm-4">
           <div className="card border-light mb-3">
@@ -193,9 +193,8 @@ export const TemporadasScreen = () => {
         </div>
         <div className="col-sm mb-5">
           <h2 className="mb-5">Temporadas creadas </h2>
-          <div className="container mt-5">
-            <ListaTemporadas temporadas={temporadas} />
-          </div>
+
+          <ListaTemporadas temporadas={temporadas} />
         </div>
       </div>
     </div>

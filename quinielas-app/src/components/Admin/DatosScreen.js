@@ -4,6 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 export const DatosScreen = () => {
+  let listaObjetosTemporal = [];
   let fileReader;
   const url = "http://localhost:4000/";
   /* */
@@ -50,12 +51,14 @@ export const DatosScreen = () => {
                   .local,
             };
 
-            guardarEnTemporal(objetoTemporal);
-            //console.log(objetoTemporal);
+            listaObjetosTemporal.push(objetoTemporal);
           }
         }
       }
     }
+
+    guardarEnTemporal(listaObjetosTemporal);
+    //console.log(listaObjetosTemporal);
   };
 
   const handleElegirArchivo = (archivo) => {
@@ -106,11 +109,24 @@ export const DatosScreen = () => {
     await axios
       .post(`${url}guardarTemporadasTemp`)
       .then((response) => {
-        console.log(response.data);
+        console.log(response);
       })
       .catch((err) => console.error(`Error ${err}`));
 
     Swal.fire("Aviso", "Temporadas almacenadas con exito", "success");
+  };
+
+  const almacenarJornadas = async (e) => {
+    e.preventDefault();
+
+    await axios
+      .post(`${url}guardarJornadasTemp`)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => console.error(`Error: ${err}`));
+
+    Swal.fire("Aviso", "Jornadas almacenadas con exito", "success");
   };
 
   const almacenarEventos = async (e) => {
@@ -119,7 +135,7 @@ export const DatosScreen = () => {
     await axios
       .post(`${url}guardarEventosTemp`)
       .then((response) => {
-        console.log(response.data);
+        console.log(response);
       })
       .catch((err) => console.error(`Error: ${err}`));
 
@@ -138,12 +154,13 @@ export const DatosScreen = () => {
     Swal.fire("Aviso", "Predicciones almacenadas con exito", "success");
   };
 
-  const almacenarResultados = async (e) => {
+  const almacenarResultados = (e) => {
     e.preventDefault();
-    await axios
-      .post(`${url}guardarResultados`)
+
+    axios
+      .post(`${url}guardarResultadosTemp`)
       .then((response) => {
-        console.log(response.data);
+        console.log(response);
       })
       .catch((err) => console.error(`Error: ${err}`));
 
@@ -225,7 +242,7 @@ export const DatosScreen = () => {
               <h5>Jornadas</h5>
             </div>
             <div className="card-body">
-              <form>
+              <form onSubmit={almacenarJornadas}>
                 <button type="submit" className="btn btn-info btn-block mt-3">
                   Cargar jornadas
                 </button>

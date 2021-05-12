@@ -18,7 +18,7 @@ export const Resultados = () => {
   // Resultados filtrados de acuerdo a la temporada
   const [resultadosFiltrados, setResultadosFiltrados] = useState([]);
   // Temporadas en estado activo
-  const [temporadasActivas, settemporadasActivas] = useState([]);
+  const [temporadasActivas, setTemporadasActivas] = useState([]);
   // Eventos filtrados en función a la temporadas a la que pertenecen
   const [eventosFiltrados, setEventosFiltrados] = useState([]);
   // Resultado del equipo local
@@ -31,6 +31,8 @@ export const Resultados = () => {
   const [equipoLocal, setEquipoLocal] = useState("");
   // Equipo visitante
   const [equipoVisitante, setEquipoVisitante] = useState("");
+  // Temporadas Activoas
+
   // Datos del formulario a enviar
   const [formValues, setFormValues] = useState({
     Id_temporada: 0,
@@ -47,6 +49,7 @@ export const Resultados = () => {
     obtenerListaEventos();
 
     const interval = setInterval(() => {
+      obtenerListaTemporadas();
       obtenerListaResultados();
     }, 5000);
 
@@ -67,7 +70,13 @@ export const Resultados = () => {
     await axios.get(`${url}temporadas`).then((response) => {
       const listaTemporadas = response.data;
       setTemporadas(listaTemporadas);
-      filtrarTemporadasActivas(temporadas);
+
+      const tempActivas = listaTemporadas.filter(
+        (temporada) => temporada.Estado === "Activo"
+      );
+
+      setTemporadasActivas(tempActivas);
+      //filtrarTemporadasActivas(temporadas);
     });
   };
 
@@ -139,7 +148,7 @@ export const Resultados = () => {
     );
 
     console.log(tempActivas);
-    settemporadasActivas(tempActivas);
+    setTemporadasActivas(tempActivas);
   };
 
   const filtrarEventos = (idTemp) => {
@@ -215,7 +224,7 @@ export const Resultados = () => {
                     value={idTemporada2}
                   >
                     <option selected="">Selecciona un temporada...</option>
-                    {temporadas.map((temporada, i) => (
+                    {temporadasActivas.map((temporada, i) => (
                       <option key={i}>{temporada.Id_temporada}</option>
                     ))}
                   </select>

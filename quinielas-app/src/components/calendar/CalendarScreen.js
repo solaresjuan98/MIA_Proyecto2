@@ -40,6 +40,8 @@ export const CalendarScreen = () => {
   const [idTemporada, setidTemporada] = useState(temporadas);
   // Estado de eventos filtrados, para mostrar en el calendario
   const [eventosFiltrados, setEventosFiltrados] = useState([]);
+  // Temporadas activas
+  const [temporadasActivas, setTemporadasActivas] = useState([]);
 
   useEffect(() => {
     obtenerListaEventos();
@@ -116,6 +118,12 @@ export const CalendarScreen = () => {
     await axios.get(`${url}temporadas`).then((response) => {
       const listaTemporadas = response.data;
       setTemporadas(listaTemporadas);
+
+      const tempActivas = listaTemporadas.filter(
+        (temporada) => temporada.Estado === 'Activo'
+      );
+
+      setTemporadasActivas(tempActivas);
     });
   };
 
@@ -144,7 +152,7 @@ export const CalendarScreen = () => {
                 value={idTemporada}
               >
                 <option>Selecciona una temporada</option>
-                {temporadas.map((temporadas, i) => {
+                {temporadasActivas.map((temporadas, i) => {
                   return <option>{temporadas.Id_temporada}</option>;
                 })}
               </select>

@@ -5,7 +5,7 @@ import DateTimePicker from "react-datetime-picker";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-moment.locale("en");
+//moment.locale("en");
 // MODAL STYLES
 const customStyles = {
   content: {
@@ -48,6 +48,8 @@ export const CalendarModal = () => {
   const [equipoVisitante, setEquipoVisitante] = useState("");
   // filtrar jornadas
   const [jornadasFiltradas, setJornadasFiltradas] = useState([]);
+  // filtrar temporadas activas
+  const [temporadasActivas, setTemporadasActivas] = useState([]);
 
   useEffect(() => {
     obtenerListaJornadas();
@@ -94,7 +96,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_inicio: moment(e).format("LLL"),
+      Fecha_inicio: moment(e).locale("en").format("LLL"),
     });
   };
 
@@ -103,7 +105,7 @@ export const CalendarModal = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_final: moment(e).format("LLL"),
+      Fecha_final: moment(e).locale("en").format("LLL"),
     });
   };
 
@@ -173,6 +175,12 @@ export const CalendarModal = () => {
       .then((response) => {
         const listaTemporadas = response.data;
         setTemporadas(listaTemporadas);
+
+        const tempActivas = listaTemporadas.filter(
+          (temporada) => temporada.Estado === "Activo"
+        );
+
+        setTemporadasActivas(tempActivas);
       })
       .catch((err) => console.error(`Error: ${err}`));
   };
@@ -217,7 +225,7 @@ export const CalendarModal = () => {
             value={idTemporada}
           >
             <option selected="">Selecciona una temporada...</option>
-            {temporadas.map((temporadas, i) => {
+            {temporadasActivas.map((temporadas, i) => {
               return <option>{temporadas.Id_temporada}</option>;
             })}
           </select>

@@ -17,6 +17,8 @@ import { TemporadasScreen } from "../components/Admin/TemporadasScreen";
 import { DatosScreen } from "../components/Admin/DatosScreen";
 import { CalendarUserScreen } from "../components/userCalendar/CalendarUserScreen";
 import { PrediccionesScreen } from "../components/Admin/PrediccionesScreen";
+import { PrediccionesUserScreen } from "../components/User/PrediccionesUserScreen";
+import { EstadisticasScreen } from "../components/Admin/EstadisticasScreen";
 
 export const InternalRoutes = () => {
   const { user } = useContext(AuthContext);
@@ -47,13 +49,23 @@ export const InternalRoutes = () => {
           <Route exact path="/carga" component={DatosScreen} />
           <Route exact path="/calendar" component={CalendarScreen} />
           <Route exact path="/predicciones" component={PrediccionesScreen} />
+          <Route exact path="/estadisticas" component={EstadisticasScreen} />
 
           {/*RUTAS PARA USUARIO */}
           <Route exact path="/userHome" component={UserDashboard} />
           <Route exact path="/membresia" component={MembresiaScreen} />
           <Route exact path="/perfilUsuario" component={PerfilScreen} />
           <Route exact path="/tablaPosiciones" component={PosicionesScreen} />
-          <Route exact path="/calendarioUsuario" component={CalendarUserScreen} />
+          <Route
+            exact
+            path="/calendarioUsuario"
+            component={CalendarUserScreen}
+          />
+          <Route
+            exact
+            path="/misPredicciones"
+            component={PrediccionesUserScreen}
+          />
 
           {/*RUTA POR DEFECTO (inicial)*/}
           <Redirect to="/login" />

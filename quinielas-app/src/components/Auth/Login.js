@@ -64,6 +64,13 @@ export const Login = ({ history }) => {
   // --- DATOS DEL FORMULARIO PARA CREAR USUARIO
   const [formValues, setFormValues] = useState(usuarioNuevo);
 
+  // --- DATOS DEL USAUARIO AUTENTICADO ---
+  const [clienteAutentiado, setClienteAutentiado] = useState("");
+  // --- ESTADO DEL USUARIO AUTENTICADO ---
+  const [autenticacionValida, setAutenticacionValida] = useState(false);
+  // --- ESTADO PARA MOTRAR ALERTA DE ERROR --
+  const [ocultarAlerta, setOcultarAlerta] = useState(true);
+
   // -------------------------------
   let rolUsuario = ""; // = "administrador";
 
@@ -107,59 +114,62 @@ export const Login = ({ history }) => {
 
     if (Nickname_login === "Administrador" && Contrasenia_login === "admin") {
       rolUsuario = "administrador";
-    } else {
-      rolUsuario = "user";
-    }
 
-    /*
-    dispatch({
-      type: types.login,
-      payload: {
-        id: 23,
-        name: Nickname_login,
-        rol: rolUsuario,
-        membresia: "Silver",
-      },
-    });
-    */
+      dispatch({
+        type: types.login,
+        payload: {
+          id: 23,
+          nickname: Nickname_login,
+          rol: rolUsuario,
+          membresia: "Silver",
+        },
+      });
 
-    /*dispatch({
-      type: types.login,
-      payload: {
-        id: 0,
-        
-      }
-    })*/
-
-    console.log(loginFormValues);
-
-    // Ejecutar procedimiento almacenado
-    axios
-      .post(`${url}iniciarSesion`, loginFormValues)
-      .then((response) => {
-        console.log(response);
-        // obtenerusuario()
-        //console.log(response.statusText);
-      })
-      .catch((err) => console.error(`Error: ${err}`));
-
-    
-    dispatch({
-      type: types.login,
-      payload: {
-        id: 23,
-        nickname: Nickname_login,
-        rol: rolUsuario,
-        membresia: "Silver",
-      },
-    });
-    
-
-    if (rolUsuario === "administrador") {
       history.replace("/adminHome");
     } else {
-      history.replace("/userHome");
+      rolUsuario = "user";
+
+      console.log(loginFormValues);
+
+      // Ejecutar procedimiento almacenado
+      axios
+        .post(`${url}iniciarSesion`, loginFormValues)
+        .then((response) => {
+          console.log(response);
+          obtenerDatosAutenticacion(Nickname_login);
+        })
+        .catch((err) => console.error(`Error: ${err}`));
+
+      if (clienteAutentiado !== "") {
+        console.log(clienteAutentiado);
+        dispatch({
+          type: types.login,
+          payload: {
+            id: clienteAutentiado.Id_cliente,
+            nickname: Nickname_login,
+            rol: rolUsuario,
+            membresia: clienteAutentiado.Membresia,
+          },
+        });
+
+        history.replace("/userHome");
+      }
+
+      setOcultarAlerta(false);
+      //console.log("f");
     }
+  };
+
+  const obtenerDatosAutenticacion = async (nickname) => {
+    await axios
+      .get(`${url}cliente/${nickname}`)
+      .then((response) => {
+        const usuarioAutenticado = response.data;
+        setClienteAutentiado(usuarioAutenticado);
+        //setAutenticacionValida(true);
+        console.log(response.status);
+      })
+      .catch((err) => console.error(`Error ${err}`));
   };
 
   // -------  manejar datos del formulario de creacion de usuario -------
@@ -316,7 +326,17 @@ export const Login = ({ history }) => {
               </button>
             </div>
           </form>
+          {ocultarAlerta ? (
+            <h6>{""}</h6>
+          ) : (
+            <div class="alert alert-dismissible alert-danger animate__animated animate__fadeIn">
+              <strong>Error al iniciar sesión</strong>
+              <br />
+              Usuario y/o contraseña incorrecta. Inténtalo de nuevo
+            </div>
+          )}
         </div>
+
         {/*---------- FORMULARIO DE REGISTRO DE USUARIO ---------*/}
         <div className="col-md-6 login-form-2 animate__animated animate__fadeInRight">
           <h3>Registrarse</h3>

@@ -20,6 +20,9 @@ export const MembresiaScreen = () => {
   // Id de temporadas
   const [idTemporada, setidTemporada] = useState("");
 
+  // Temporadas activas
+  const [temporadasActivas, setTemporadasActivas] = useState([]);
+
   useEffect(() => {
     obtenerDatosCliente();
     obtenerTemporadas();
@@ -44,6 +47,12 @@ export const MembresiaScreen = () => {
       .then((response) => {
         const listaTemporadas = response.data;
         setTemporadas(listaTemporadas);
+
+        const tempActivas = listaTemporadas.filter(
+          (temporada) => temporada.Estado === "Activo"
+        );
+
+        setTemporadasActivas(tempActivas);
       })
       .catch((err) => console.error(`Error ${err}`));
   };
@@ -173,7 +182,7 @@ export const MembresiaScreen = () => {
         value={idTemporada}
       >
         <option>Selecciona una temporada</option>
-        {temporadas.map((temporadas, i) => {
+        {temporadasActivas.map((temporadas, i) => {
           return <option>{temporadas.Id_temporada}</option>;
         })}
       </select>

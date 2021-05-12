@@ -19,7 +19,7 @@ export const UserNavbar = () => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark animate__animated animate__fadeIn">
         <NavLink className="navbar-brand" exact to="/userHome">
           Inicio
         </NavLink>
@@ -57,6 +57,11 @@ export const UserNavbar = () => {
             <li className="nav-item">
               <NavLink className="nav-link" exact to="/membresia">
                 Membresia
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" exact to="/misPredicciones">
+                Predicciones
               </NavLink>
             </li>
           </ul>

@@ -16,7 +16,6 @@ let tieneMembresia = false;
 
 let events_ = [];
 
-
 /*
   Los eventos del calendario son relativamente simples para otorgar una mayor facilidad de uso para el usuario. La
   única información relevante por cada evento a mostrar en el calendario de navegación además de su color será el
@@ -56,9 +55,12 @@ export const CalendarUserScreen = () => {
     clienteLogueado.Membresia === "bronze"
   ) {
     tieneMembresia = true;
-  } else if(clienteLogueado.Membresia === "gratis" || clienteLogueado.Membresia === "Gratis"){
+  } else if (
+    clienteLogueado.Membresia === "gratis" ||
+    clienteLogueado.Membresia === "Gratis"
+  ) {
     tieneMembresia = false;
-  }else{
+  } else {
     tieneMembresia = false;
   }
 

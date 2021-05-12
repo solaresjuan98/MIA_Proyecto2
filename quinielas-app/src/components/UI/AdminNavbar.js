@@ -20,7 +20,7 @@ export const AdminNavbar = () => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark  animate__animated animate__fadeIn">
         <NavLink className="navbar-brand" exact to="/adminHome">
           AdminNavbar
         </NavLink>
@@ -86,11 +86,16 @@ export const AdminNavbar = () => {
             </li>
 
             <li className="nav-item">
+              <NavLink className="nav-link" exact to="/estadisticas">
+                Estadisticas
+              </NavLink>
+            </li>
+
+            <li className="nav-item">
               <NavLink className="nav-link" exact to="/reportes">
                 Reportes
               </NavLink>
             </li>
-
           </ul>
           <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul className="navbar-nav ml-auto">

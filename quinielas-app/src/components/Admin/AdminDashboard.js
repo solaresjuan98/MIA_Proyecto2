@@ -1,28 +1,43 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 export const AdminDashboard = () => {
+  const url = "http://localhost:4000/";
+
+  useEffect(() => {
+    obtenerCapital();
+  }, []);
+
+  // Estado de capital de temporada
+  const [capitalTemp, setCapitalTemp] = useState([]);
+
+  const obtenerCapital = async () => {
+    await axios
+      .get(`${url}capitalTemporada`)
+      .then((response) => {
+        const listaCapital = response.data;
+        setCapitalTemp(listaCapital);
+      })
+      .catch((err) => console.error(`Err: ${err}`));
+  };
+
   return (
     <div className="container-fluid mt-5">
       {/*Dashboard*/}
       <div className="row">
-        <div className="col-sm-4">
-          <ul className="list-group">
-            <li className="list-group-item d-flex justify-content-between align-items-center">
-              Mi perfil
-              <span className="badge badge-primary badge-pill">14</span>
-            </li>
-            <li className="list-group-item d-flex justify-content-between align-items-center">
-              Eventos
-              <span className="badge badge-primary badge-pill">2</span>
-            </li>
-            <li className="list-group-item d-flex justify-content-between align-items-center">
-              Mensajes
-              <span className="badge badge-primary badge-pill">1</span>
-            </li>
-            <li className="list-group-item d-flex justify-content-between align-items-center">
-              Deportes
-              <span className="badge badge-primary badge-pill">45</span>
-            </li>
+        <div className="col-sm-4 animate__animated animate__backInDown">
+          <h3>Capital de temporada actual</h3>
+          <ul className="list-group mt-3">
+            {capitalTemp.map((capital, i) => {
+              return (
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                  Temporada: {capital.Nombre_temporada}
+                  <span className="badge badge-primary badge-pill">
+                    Q. {capital.Total_pagado}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -91,53 +106,9 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="row mt-3">
-        <div className="col-sm-4">
-          <h1>More content</h1>
-        </div>
+      <div className="row mt-3"></div>
 
-        <div className="col align-self-end">
-          <h3>Tabla de posiciones</h3>
-          <table className="table">
-            <thead className="thead-dark">
-              <tr>
-                <th scope="col">Posición</th>
-                <th scope="col">Jugador</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry</td>
-                <td>the Bird</td>
-                <td>@twitter</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="row mt-3">
-        <div className="col-sm-4">
-          <h1>More content</h1>
-        </div>
-
-        <div className="col align-self-end">One of three columns</div>
-      </div>
+      <div className="row mt-3"></div>
 
       {/* ---------- */}
     </div>

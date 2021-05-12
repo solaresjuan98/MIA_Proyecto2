@@ -33,6 +33,10 @@ export const JornadasScreen = () => {
   // Formulario
   const [formValues, setFormValues] = useState(jornadaInicial);
 
+  // Temporadas en estado activo
+  const [temporadasActivas, setTemporadasActivas] = useState([]);
+
+
   //const { Fecha_inicio, Fecha_fin } = formValues;
 
   // URL DE LA API
@@ -51,12 +55,21 @@ export const JornadasScreen = () => {
   }, []);
 
   // ------- OBTENER LISTA DE TEMPORADAS -------
-  const obtenerListaTemporadas = () => {
-    axios
+  const obtenerListaTemporadas = async () => {
+    await axios
       .get(`${url}temporadas`)
       .then((response) => {
         const listaTemporadas = response.data;
         obtenerTemporadas(listaTemporadas);
+        
+        //console.log(temporadas);
+        const tempActivas = listaTemporadas.filter(
+          (temporada) => temporada.Estado === 'Activo'
+        );
+
+        //console.log(tempActivas);
+
+        setTemporadasActivas(tempActivas);
       })
       .catch((err) => console.error(`Error: ${err}`));
   };
@@ -135,7 +148,7 @@ export const JornadasScreen = () => {
 
   //console.log(moment(ahora).format("l"));
   return (
-    <div className="container mt-5">
+    <div className="container-fluid mt-5">
       <div className="row mt-5">
         <div className="col-sm-4">
           <div className="card border-dark mb-3">
@@ -154,7 +167,7 @@ export const JornadasScreen = () => {
                     <option selected="custom-select">
                       Selecciona una Temporada...
                     </option>
-                    {temporadas.map((temporada, i) => (
+                    {temporadasActivas.map((temporada, i) => (
                       <option key={i}>{temporada.Id_temporada}</option>
                     ))}
                   </select>
