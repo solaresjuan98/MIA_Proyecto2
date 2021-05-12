@@ -6,7 +6,7 @@ import { ListaJornadas } from "./ListaJornadas";
 //import { useForm } from "../hooks/useForm";
 import Swal from "sweetalert2";
 
-moment.locale('en');
+moment.locale("en");
 // Definir las fecha de inicio y de fin por defecto de la jornada
 const ahora = moment().minutes(0).seconds(0).add(1, "hours");
 const fin = ahora.clone().add(1, "week");
@@ -36,7 +36,6 @@ export const JornadasScreen = () => {
   // Temporadas en estado activo
   const [temporadasActivas, setTemporadasActivas] = useState([]);
 
-
   //const { Fecha_inicio, Fecha_fin } = formValues;
 
   // URL DE LA API
@@ -61,10 +60,10 @@ export const JornadasScreen = () => {
       .then((response) => {
         const listaTemporadas = response.data;
         obtenerTemporadas(listaTemporadas);
-        
+
         //console.log(temporadas);
         const tempActivas = listaTemporadas.filter(
-          (temporada) => temporada.Estado === 'Activo'
+          (temporada) => temporada.Estado === "Activo"
         );
 
         //console.log(tempActivas);
@@ -88,7 +87,7 @@ export const JornadasScreen = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_inicio: moment(e).format("LLL"),
+      Fecha_inicio: moment(e).locale("en").format("LLL"),
     });
   };
 
@@ -97,7 +96,7 @@ export const JornadasScreen = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_final: moment(e).format("LLL"),
+      Fecha_final: moment(e).locale("en").format("LLL"),
     });
   };
 

@@ -287,7 +287,7 @@ func getPrueba(w http.ResponseWriter, r *http.Request) {
 
 func getPeopleRouter(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	//limit := 45
+
 	limit, _ := strconv.Atoi(r.FormValue("limit"))
 
 	people := getData(limit)

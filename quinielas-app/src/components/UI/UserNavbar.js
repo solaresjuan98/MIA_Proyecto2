@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useHistory, NavLink } from "react-router-dom";
 import { AuthContext } from "../../Auth/AuthContext";
 import "../../index.css";
@@ -7,7 +7,14 @@ import { types } from "../../types/types";
 export const UserNavbar = () => {
   const { user, dispatch } = useContext(AuthContext);
   //console.log(rol);
-  console.log(user);
+  //console.log(user);
+
+  const [navbarColapsado, setNavbarColapsado] = useState(true);
+
+  const handleColapsarNavbar = () => {
+    setNavbarColapsado(!navbarColapsado);
+  };
+
   const history = useHistory();
 
   const handleLogout = () => {
@@ -29,13 +36,19 @@ export const UserNavbar = () => {
           data-toggle="collapse"
           data-target="#navbarColor01"
           aria-controls="navbarColor01"
-          aria-expanded="false"
+          aria-expanded={!navbarColapsado ? true : false}
           aria-label="Toggle navigation"
+          onClick={handleColapsarNavbar}
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarColor01">
+        <div
+          className={`${
+            navbarColapsado ? "collapse" : ""
+          } navbar-collapse animate__animated animate__fadeIn`}
+          id="navbarColor01"
+        >
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
               <NavLink className="nav-link" exact to="/userHome">

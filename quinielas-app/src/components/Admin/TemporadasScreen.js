@@ -86,7 +86,7 @@ export const TemporadasScreen = () => {
     //console.log(moment(e).format("L"))
     setFormValues({
       ...formValues,
-      Fecha_inicio: moment(e).format("LLL"),
+      Fecha_inicio: moment(e).locale("en").format("LLL"),
     });
   };
 
@@ -97,7 +97,7 @@ export const TemporadasScreen = () => {
 
     setFormValues({
       ...formValues,
-      Fecha_fin: moment(e).format("LLL"),
+      Fecha_fin: moment(e).locale("en").format("LLL"),
     });
   };
 

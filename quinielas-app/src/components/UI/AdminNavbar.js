@@ -1,13 +1,18 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useHistory, NavLink } from "react-router-dom";
 import { AuthContext } from "../../Auth/AuthContext";
-
 import "../../index.css";
 import { types } from "../../types/types";
 
 export const AdminNavbar = () => {
   const { user, dispatch } = useContext(AuthContext);
   //console.log(user);
+
+  const [navbarColapsado, setnavbarColapsado] = useState(true);
+
+  const handleColapsarNavbar = () => {
+    setnavbarColapsado(!navbarColapsado);
+  };
 
   const history = useHistory();
 
@@ -20,7 +25,7 @@ export const AdminNavbar = () => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark  animate__animated animate__fadeIn">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <NavLink className="navbar-brand" exact to="/adminHome">
           AdminNavbar
         </NavLink>
@@ -30,14 +35,20 @@ export const AdminNavbar = () => {
           data-toggle="collapse"
           data-target="#navbarColor01"
           aria-controls="navbarColor01"
-          aria-expanded="false"
+          aria-expanded={!navbarColapsado ? true : false}
           aria-label="Toggle navigation"
+          onClick={handleColapsarNavbar}
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarColor01">
-          <ul className="navbar-nav mr-auto">
+        <div
+          className={`${
+            navbarColapsado ? "collapse" : ""
+          } navbar-collapse animate__animated animate__fadeIn`}
+          id="navbarColor01"
+        >
+          <ul className="navbar-nav mr-auto animate__animated animate__fadeIn">
             <li className="nav-item active">
               <NavLink className="nav-link" exact to="/adminHome">
                 Inicio
